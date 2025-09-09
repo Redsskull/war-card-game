@@ -24,10 +24,10 @@ func StartGame() (*Player, *Player) {
 
 }
 
-func PlayRound(player1 *Player, cpu *Player) string {
+func PlayRound(player1 *Player, cpu *Player) (Card, Card, string) {
 	// Check if either player can't war, this is a game over condition
 	if !player1.HasCards() || !cpu.HasCards() {
-		return "Game over - someone ran out of cards"
+		return Card{}, Card{}, "Game over - someone ran out of cards"
 	}
 
 	allCards := []Card{} // All cards that will go to the winner
@@ -36,6 +36,10 @@ func PlayRound(player1 *Player, cpu *Player) string {
 	card1 := player1.PlayCard()
 	card2 := cpu.PlayCard()
 	allCards = append(allCards, card1, card2)
+
+	// Keep track of the final cards for display
+	finalCard1 := card1
+	finalCard2 := card2
 
 	result := fmt.Sprintf("Player: %s, CPU: %s", card1, card2)
 
@@ -51,6 +55,7 @@ func PlayRound(player1 *Player, cpu *Player) string {
 		allCards = append(allCards, warCards2...)
 
 		card1, card2 = lastCard1, lastCard2
+		finalCard1, finalCard2 = card1, card2 // Update final cards
 		result += fmt.Sprintf(" -> Player: %s, CPU: %s", card1, card2)
 	}
 
@@ -69,7 +74,7 @@ func PlayRound(player1 *Player, cpu *Player) string {
 		result += " -> CPU wins!"
 	}
 
-	return result
+	return finalCard1, finalCard2, result
 }
 
 // Helper function to handle war card placement
