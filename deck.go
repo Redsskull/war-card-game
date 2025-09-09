@@ -1,5 +1,7 @@
 package main
 
+import "math/rand"
+
 type Deck struct {
 	Cards []Card // Slice of Card structs
 }
@@ -26,4 +28,13 @@ func NewDeck() Deck {
 	cards = append(cards, superColorfulAce, superBlackAce, colorfulJoker, blackJoker)
 
 	return Deck{Cards: cards}
+}
+
+// Shuffle randomizes the order of cards in the deck
+// Fisher-Yates shuffle algorithm
+func (d *Deck) Shuffle() {
+	for i := len(d.Cards) - 1; i > 0; i-- {
+		j := rand.Intn(i + 1)
+		d.Cards[i], d.Cards[j] = d.Cards[j], d.Cards[i]
+	}
 }
