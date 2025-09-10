@@ -23,7 +23,22 @@ func main() {
 	title := widget.NewLabel("🃏 War Card Game")
 	title.TextStyle.Bold = true
 
-	// Card displays - make them BIG and readable
+	// 🎯 FYNE'S RESPONSIVE WAY: No hardcoded sizes!
+	fmt.Println("Attempting to load: Cards/card_spade_ace.png")
+	testCardImage := canvas.NewImageFromFile("Cards/card_spade_ace.png")
+
+	if testCardImage == nil {
+		fmt.Println("ERROR: Image failed to load!")
+	} else {
+		fmt.Println("SUCCESS: Image loaded!")
+	}
+
+	// 🔑 THE MAGIC: Set a minimum size, let FillMode handle scaling
+	testCardImage.SetMinSize(fyne.NewSize(80, 110))  // Minimum card size
+	testCardImage.FillMode = canvas.ImageFillContain // Scale to fit, preserve aspect ratio
+	// No Resize() call - let the container decide actual size!
+
+	// Keep the normal labels for now
 	playerCardDisplay := widget.NewLabel("Ready to play!")
 	cpuCardDisplay := widget.NewLabel("Ready to play!")
 
@@ -31,7 +46,7 @@ func main() {
 	playerCardDisplay.Alignment = fyne.TextAlignCenter
 	cpuCardDisplay.Alignment = fyne.TextAlignCenter
 
-	// Score displays - show ACTUAL card counts
+	// Score displays
 	playerScore := widget.NewLabel(fmt.Sprintf("Your cards: %d", len(player1.Cards)))
 	cpuScore := widget.NewLabel(fmt.Sprintf("CPU cards: %d", len(cpu.Cards)))
 
@@ -93,8 +108,13 @@ func main() {
 		widget.NewSeparator(),
 		cpuSection)
 
-	// MIDDLE: Game results (later card icons)
-	middleArea := container.NewCenter(gameResult)
+	// MIDDLE: Let the border layout allocate space, image scales to fit
+	middleArea := container.NewCenter(
+		container.NewVBox(
+			widget.NewSeparator(),
+			testCardImage, // Image will scale to available VBox space!
+			widget.NewSeparator(),
+			gameResult))
 
 	// BOTTOM: Score left, button right
 	bottomArea := container.NewCenter(

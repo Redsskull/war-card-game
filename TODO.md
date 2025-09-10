@@ -15,10 +15,20 @@
 - [x ] Test that new deck works properly
 
 ### PHASE 2: Add Card Images (Visual Upgrade)
-- [ ] Create `assets/` folder in project -- created cards folder instead!
-- [ ] Add all card front images to assets folder
-- [ ] Add card back images (red and blue) to assets folder -- I need to pick one one of the back images to become blue, I hope Flye can do this.
-- [ ] Test loading one image first before doing all cards
+- [x] Create cards folder - Done!
+- [x] Add all card images - Done!
+- [ x] **TEST STEP**: Load just ONE card image first
+- [ ] Create helper function to map Card→filename
+- [ ] Choose card backs (player vs CPU)
+- [ ] Test card back loading
+
+### PHASE 2A: The Mapping Challenge 🧩
+We need to translate:
+- Card{Value: 13, Suit: "Hearts"} → "Cards/card_heart_13.png"
+- Card{Value: 15, Suit: "ColorfulJoker"} → "Cards/card_joker.png"
+- Card{Value: 16, Suit: "RedJoker"} → "Cards/card_joker_red.png"
+- Card{Value: 17, Suit: "BlackJoker"} → "Cards/card_joker_black.png"
+
 
 ### PHASE 3: Display Card Images in Game
 - [ ] Replace text card display with actual card images
