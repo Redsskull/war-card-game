@@ -19,98 +19,158 @@ func main() {
 	myWindow := myApp.NewWindow("War Card Game")
 	myWindow.Resize(fyne.NewSize(800, 600))
 
-	// Score displays
-	playerScore := widget.NewLabel(fmt.Sprintf("Your cards: %d", len(player1.Cards)))
-	cpuScore := widget.NewLabel(fmt.Sprintf("CPU cards: %d", len(cpu.Cards)))
+	// CARD COUNT LABELS
+	cpuCardCount := widget.NewLabel(fmt.Sprintf("%d", len(cpu.Cards)))
+	cpuCardCount.Alignment = fyne.TextAlignCenter
+	cpuCardCount.TextStyle.Bold = true
 
-	// 🎯 HIDDEN PLACEHOLDERS - Start invisible!
+	playerCardCount := widget.NewLabel(fmt.Sprintf("%d", len(player1.Cards)))
+	playerCardCount.Alignment = fyne.TextAlignCenter
+	playerCardCount.TextStyle.Bold = true
+
+	// PLAYED CARD IMAGES (hidden initially)
 	playerCardImage := canvas.NewImageFromFile("Cards/card_joker.png")
 	playerCardImage.SetMinSize(fyne.NewSize(80, 110))
 	playerCardImage.FillMode = canvas.ImageFillContain
-	playerCardImage.Hide() // Start hidden!
+	playerCardImage.Hide()
 
 	cpuCardImage := canvas.NewImageFromFile("Cards/card_joker.png")
 	cpuCardImage.SetMinSize(fyne.NewSize(80, 110))
 	cpuCardImage.FillMode = canvas.ImageFillContain
-	cpuCardImage.Hide() // Start hidden!
+	cpuCardImage.Hide()
 
+	// HAND CARD BACKS
+	playerHandImage := canvas.NewImageFromFile("Cards/card_back_suits.png")
+	playerHandImage.SetMinSize(fyne.NewSize(60, 80))
+	playerHandImage.FillMode = canvas.ImageFillContain
+
+	cpuHandImage := canvas.NewImageFromFile("Cards/card_back_suits_dark.png")
+	cpuHandImage.SetMinSize(fyne.NewSize(60, 80))
+	cpuHandImage.FillMode = canvas.ImageFillContain
+
+	// TITLE
+	gameTitle := widget.NewLabel("🃏 War Card Game")
+	gameTitle.TextStyle.Bold = true
+
+	// GAME RESULT (hidden initially)
+	gameResult := widget.NewLabel("")
+	gameResult.Alignment = fyne.TextAlignCenter
+	gameResult.Hide()
+
+	// SIMPLE ENHANCED INITIAL DISPLAY - BIGGER!
+	initialDisplay := container.NewCenter(
+		container.NewVBox(
+			container.NewCenter(
+				func() *canvas.Text {
+					sword := canvas.NewText("⚔️", color.White)
+					sword.TextSize = 48
+					sword.TextStyle.Bold = true
+					sword.Alignment = fyne.TextAlignCenter
+					return sword
+				}()),
+
+			container.NewCenter(
+				container.NewHBox(
+					widget.NewLabel("👤 PLAYER"),
+					func() *canvas.Text {
+						vs := canvas.NewText("🆚", color.White)
+						vs.TextSize = 36
+						vs.TextStyle.Bold = true
+						vs.Alignment = fyne.TextAlignCenter
+						return vs
+					}(),
+					widget.NewLabel("🤖 CPU"))),
+
+			container.NewCenter(
+				func() *widget.Label {
+					ready := widget.NewLabel("Ready for Battle!")
+					ready.TextStyle.Bold = true
+					return ready
+				}())))
+
+	// BATTLE AREA (hidden initially)
+	battleArea := container.NewCenter(
+		container.NewHBox(playerCardImage, widget.NewLabel("  VS  "), cpuCardImage))
+	battleArea.Hide()
+
+	// UPDATE SCORES FUNCTION
 	updateScores := func() {
-		playerScore.SetText(fmt.Sprintf("Your cards: %d", len(player1.Cards)))
-		cpuScore.SetText(fmt.Sprintf("CPU cards: %d", len(cpu.Cards)))
+		cpuCardCount.SetText(fmt.Sprintf("%d", len(cpu.Cards)))
+		playerCardCount.SetText(fmt.Sprintf("%d", len(player1.Cards)))
 	}
 
-	// Game result
-	gameResult := widget.NewLabel("Click 'Start Game' to begin!")
-	gameResult.Alignment = fyne.TextAlignCenter
+	// Add visual hint
+	hintLabel := widget.NewLabel("👆 Click card to play!")
+	hintLabel.Alignment = fyne.TextAlignCenter
+	hintLabel.Hide()
 
-	// Play button
-	var playButton *widget.Button
-	playButton = widget.NewButton("Start Game", func() {
+	// PLAY ROUND LOGIC
+	executeRound := func() {
 		if !player1.HasCards() || !cpu.HasCards() {
 			return
 		}
-		if playButton.Text == "Start Game" {
-			playButton.SetText("Play Round")
-		}
 
-		// Get the cards and result
 		playerCard, cpuCard, result := PlayRound(player1, cpu)
 
-		// 🎯 UPDATE AND SHOW THE IMAGES!
 		playerCardImage.File = playerCard.GetImageFilename()
-		playerCardImage.Show() // Make visible now!
+		playerCardImage.Show()
 		playerCardImage.Refresh()
 
 		cpuCardImage.File = cpuCard.GetImageFilename()
-		cpuCardImage.Show() // Make visible now!
+		cpuCardImage.Show()
 		cpuCardImage.Refresh()
 
-		// Show result
 		gameResult.SetText(result)
+		gameResult.Show()
 		updateScores()
 
-		// Check game over
 		if !player1.HasCards() {
 			gameResult.SetText("GAME OVER!\nCPU WINS! 🤖")
-			playButton.SetText("Game Over")
-			playButton.Disable()
+			hintLabel.Hide()
 		} else if !cpu.HasCards() {
 			gameResult.SetText("GAME OVER!\nYOU WIN! 🏆")
-			playButton.SetText("Game Over")
-			playButton.Disable()
+			hintLabel.Hide()
+		}
+	}
+
+	// START GAME BUTTON
+	var playButton *widget.Button
+	playButton = widget.NewButton("Start Game", func() {
+		gameTitle.Hide()
+		playButton.Hide()
+		initialDisplay.Hide()
+		battleArea.Show()
+		hintLabel.Show() // Show hint when game starts
+	})
+
+	// CREATE CLICKABLE CARD using effects.go
+	clickablePlayerCard := NewClickableCard(playerHandImage, playerCardCount, func() {
+		if !gameTitle.Visible() && battleArea.Visible() {
+			executeRound()
 		}
 	})
 
-	// Layout
+	// LAYOUT
+	topArea := container.NewCenter(
+		container.NewVBox(
+			gameTitle,
+			widget.NewSeparator(),
+			container.NewStack(cpuHandImage, cpuCardCount)))
 
-	// TOP
-	topArea := container.NewVBox(
-		container.NewCenter(widget.NewLabel("🃏 War Card Game")),
-		widget.NewSeparator(),
-		container.NewCenter(cpuScore))
-
-	//MIDDLE
-	// 🎯 FIXED CARD AREA - Independent of text!
-	cardDisplayArea := container.NewCenter(
-		container.NewHBox(playerCardImage, widget.NewLabel("  VS  "), cpuCardImage))
-
-	// 🎯 SEPARATE TEXT AREA - Doesn't affect cards!
-	textDisplayArea := container.NewCenter(gameResult)
-
-	// 🎯 CENTER a VBox - gives you both centering AND vertical layout!
 	middleArea := container.NewCenter(
 		container.NewVBox(
-			cardDisplayArea,       // Cards at top
-			widget.NewSeparator(), // Line in middle (or remove this line)
-			textDisplayArea))      // Text at bottom
+			container.NewStack(initialDisplay, battleArea),
+			playButton,
+			gameResult))
 
-	//BOTTOM
 	bottomArea := container.NewCenter(
-		container.NewHBox(playerScore, playButton))
+		container.NewVBox(
+			hintLabel,
+			clickablePlayerCard)) // Use the clickable card widget from effects.go!
 
 	content := container.NewBorder(topArea, bottomArea, nil, nil, middleArea)
 
-	// Background
+	// FINAL DISPLAY
 	background := canvas.NewRectangle(color.RGBA{70, 130, 180, 255})
 	contentWithBackground := container.NewStack(background, container.NewPadded(content))
 	myWindow.SetContent(contentWithBackground)
