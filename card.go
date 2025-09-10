@@ -103,3 +103,42 @@ func (c Card) String() string {
 		return fmt.Sprintf("%s of %s", c.GetDisplayValue(), c.Suit)
 	}
 }
+
+// GetImageFilename returns the correct filename for this card's image
+func (c Card) GetImageFilename() string {
+	// Handle the 3 special jokers first
+	switch c.Suit {
+	case "Joker":
+		return "Cards/card_joker.png" // Normal joker (15)
+	case "Red Joker":
+		return "Cards/card_joker_red.png" // Red joker (16)
+	case "Black Joker":
+		return "Cards/card_joker_black.png" // Black joker (17)
+	}
+
+	// Handle regular cards (2-14)
+	// Convert suit name to match your filenames
+	var suitName string
+	switch c.Suit {
+	case "Hearts":
+		suitName = "heart" // Your files: "card_heart_..."
+	case "Diamonds":
+		suitName = "diamond" // Your files: "card_diamond_..."
+	case "Clubs":
+		suitName = "clubs" // Your files: "card_clubs_..."
+	case "Spades":
+		suitName = "spade" // Your files: "card_spade_..."
+	default:
+		return "Cards/card_joker.png" // Fallback
+	}
+
+	// Convert value to match your filenames
+	var valueStr string
+	if c.Value == 14 {
+		valueStr = "ace" // Your files use "card_heart_ace.png"
+	} else {
+		valueStr = fmt.Sprintf("%d", c.Value) // "2", "3", "4"... "13"
+	}
+
+	return fmt.Sprintf("Cards/card_%s_%s.png", suitName, valueStr)
+}
