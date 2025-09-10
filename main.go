@@ -23,14 +23,16 @@ func main() {
 	playerScore := widget.NewLabel(fmt.Sprintf("Your cards: %d", len(player1.Cards)))
 	cpuScore := widget.NewLabel(fmt.Sprintf("CPU cards: %d", len(cpu.Cards)))
 
-	// 🃏 CARD IMAGES - Start with placeholder
+	// 🎯 HIDDEN PLACEHOLDERS - Start invisible!
 	playerCardImage := canvas.NewImageFromFile("Cards/card_joker.png")
 	playerCardImage.SetMinSize(fyne.NewSize(80, 110))
 	playerCardImage.FillMode = canvas.ImageFillContain
+	playerCardImage.Hide() // Start hidden!
 
 	cpuCardImage := canvas.NewImageFromFile("Cards/card_joker.png")
 	cpuCardImage.SetMinSize(fyne.NewSize(80, 110))
 	cpuCardImage.FillMode = canvas.ImageFillContain
+	cpuCardImage.Hide() // Start hidden!
 
 	updateScores := func() {
 		playerScore.SetText(fmt.Sprintf("Your cards: %d", len(player1.Cards)))
@@ -54,11 +56,13 @@ func main() {
 		// Get the cards and result
 		playerCard, cpuCard, result := PlayRound(player1, cpu)
 
-		// 🎯 UPDATE THE IMAGES WITH ACTUAL CARDS!
+		// 🎯 UPDATE AND SHOW THE IMAGES!
 		playerCardImage.File = playerCard.GetImageFilename()
+		playerCardImage.Show() // Make visible now!
 		playerCardImage.Refresh()
 
 		cpuCardImage.File = cpuCard.GetImageFilename()
+		cpuCardImage.Show() // Make visible now!
 		cpuCardImage.Refresh()
 
 		// Show result
@@ -78,18 +82,29 @@ func main() {
 	})
 
 	// Layout
+
+	// TOP
 	topArea := container.NewVBox(
 		container.NewCenter(widget.NewLabel("🃏 War Card Game")),
 		widget.NewSeparator(),
 		container.NewCenter(cpuScore))
 
+	//MIDDLE
+	// 🎯 FIXED CARD AREA - Independent of text!
+	cardDisplayArea := container.NewCenter(
+		container.NewHBox(playerCardImage, widget.NewLabel("  VS  "), cpuCardImage))
+
+	// 🎯 SEPARATE TEXT AREA - Doesn't affect cards!
+	textDisplayArea := container.NewCenter(gameResult)
+
+	// 🎯 CENTER a VBox - gives you both centering AND vertical layout!
 	middleArea := container.NewCenter(
 		container.NewVBox(
-			widget.NewSeparator(),
-			container.NewHBox(playerCardImage, widget.NewLabel(" VS "), cpuCardImage),
-			widget.NewSeparator(),
-			gameResult))
+			cardDisplayArea,       // Cards at top
+			widget.NewSeparator(), // Line in middle (or remove this line)
+			textDisplayArea))      // Text at bottom
 
+	//BOTTOM
 	bottomArea := container.NewCenter(
 		container.NewHBox(playerScore, playButton))
 
