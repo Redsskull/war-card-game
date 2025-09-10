@@ -6,7 +6,7 @@ import (
 
 // Card represents a playing card with a number and suit.
 type Card struct {
-	Value int    // 2-18
+	Value int    // 2-17
 	Suit  string // Hearts, Diamonds, Clubs, Spades, and your special suits
 }
 
@@ -14,20 +14,18 @@ type Card struct {
 func (c Card) GetDisplayValue() string {
 	switch c.Value {
 	case 14:
-		return "Ace" // Full name instead of "A"
+		return "Ace"
 	case 13:
-		return "King" // Full name instead of "K"
+		return "King"
 	case 12:
-		return "Queen" // Full name instead of "Q"
+		return "Queen"
 	case 11:
-		return "Jack" // Full name instead of "J"
+		return "Jack"
 	case 15:
-		return "Super Ace" // Super Colorful Ace
+		return "Joker" // Normal Joker
 	case 16:
-		return "Super Black Ace" // Super Black Ace
+		return "Red Joker" // Red Joker
 	case 17:
-		return "Colorful Joker" // Colorful Joker
-	case 18:
 		return "Black Joker" // Black Joker
 	default:
 		return fmt.Sprintf("%d", c.Value)
@@ -45,12 +43,10 @@ func (c Card) GetSuitSymbol() string {
 		return "♣"
 	case "Spades":
 		return "♠"
-	case "ColorfulBigAce":
+	case "Joker":
 		return "🌈" // Rainbow for colorful
-	case "BlackBigAce":
-		return "⚫" // Black circle
-	case "ColorfulJoker":
-		return "🃏" // Joker emoji
+	case "RedJoker":
+		return "🔴" // Red circle
 	case "BlackJoker":
 		return "🖤" // Black heart
 	default:
@@ -63,9 +59,9 @@ func (c Card) GetSuitColor() string {
 	switch c.Suit {
 	case "Hearts", "Diamonds":
 		return "red"
-	case "Clubs", "Spades", "BlackBigAce", "BlackJoker":
+	case "Clubs", "Spades", "BlackJoker":
 		return "black"
-	case "ColorfulBigAce", "ColorfulJoker":
+	case "Red Joker", "Joker":
 		return "rainbow" // I'll handle this specially in the UI
 	default:
 		return "black"
@@ -96,14 +92,13 @@ func (c Card) GetCompactDisplay() string {
 // Enhanced description that shows the power hierarchy
 func (c Card) String() string {
 	switch c.Value {
-	case 18:
-		return "🖤 BLACK JOKER (Highest!)"
+
 	case 17:
-		return "🃏 COLORFUL JOKER"
+		return "🃏 Black JOKER"
 	case 16:
-		return "⚫ SUPER BLACK ACE"
+		return "⚫ Red Joker!"
 	case 15:
-		return "🌈 SUPER COLORFUL ACE"
+		return "🌈 Joker!"
 	default:
 		return fmt.Sprintf("%s of %s", c.GetDisplayValue(), c.Suit)
 	}

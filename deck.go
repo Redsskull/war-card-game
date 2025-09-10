@@ -20,12 +20,11 @@ func NewDeck() Deck {
 	}
 
 	// Add special cards
-	superColorfulAce := Card{Value: 15, Suit: "ColorfulBigAce"}
-	superBlackAce := Card{Value: 16, Suit: "BlackBigAce"}
-	colorfulJoker := Card{Value: 17, Suit: "ColorfulJoker"}
-	blackJoker := Card{Value: 18, Suit: "BlackJoker"}
+	joker := Card{Value: 15, Suit: "Joker"}
+	red_joker := Card{Value: 16, Suit: "Red Joker"}
+	black_joker := Card{Value: 17, Suit: "Black Joker"}
 
-	cards = append(cards, superColorfulAce, superBlackAce, colorfulJoker, blackJoker)
+	cards = append(cards, joker, red_joker, black_joker)
 
 	return Deck{Cards: cards}
 }

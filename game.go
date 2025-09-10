@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+)
 
 func StartGame() (*Player, *Player) {
 	// 1. Create two players
@@ -15,11 +18,29 @@ func StartGame() (*Player, *Player) {
 	deck.Shuffle()
 	fmt.Println("Deck shuffled!")
 
-	// 4. Deal cards to both players (28 each)
-	for i := range 28 {
-		player1.AddCard(deck.Cards[i])
-		cpu.AddCard(deck.Cards[i+28])
+	// 4. Deal cards evenly to both players, give leftover to random player
+	totalCards := len(deck.Cards)
+	cardsPerPlayer := totalCards / 2 // 55/2 = 27 (integer division)
+
+	// Deal base cards to each player
+	for i := range cardsPerPlayer {
+		player1.AddCard(deck.Cards[i])            // Player gets 0-26
+		cpu.AddCard(deck.Cards[i+cardsPerPlayer]) // CPU gets 27-53
 	}
+
+	// Deal leftover card(s) randomly
+	leftoverCards := totalCards - (cardsPerPlayer * 2) // 55 - 54 = 1 leftover
+	for i := range leftoverCards {
+		cardIndex := cardsPerPlayer*2 + i // Index 54 for the leftover card
+		if rand.Intn(2) == 0 {            // Random 0 or 1
+			player1.AddCard(deck.Cards[cardIndex])
+			fmt.Println("Player got the bonus card!")
+		} else {
+			cpu.AddCard(deck.Cards[cardIndex])
+			fmt.Println("CPU got the bonus card!")
+		}
+	}
+
 	return &player1, &cpu // Return pointers to the players
 
 }

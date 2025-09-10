@@ -31,9 +31,9 @@ func main() {
 	playerCardDisplay.Alignment = fyne.TextAlignCenter
 	cpuCardDisplay.Alignment = fyne.TextAlignCenter
 
-	// Score displays
-	playerScore := widget.NewLabel("Your cards: 28")
-	cpuScore := widget.NewLabel("CPU cards: 28")
+	// Score displays - show ACTUAL card counts
+	playerScore := widget.NewLabel(fmt.Sprintf("Your cards: %d", len(player1.Cards)))
+	cpuScore := widget.NewLabel(fmt.Sprintf("CPU cards: %d", len(cpu.Cards)))
 
 	updateScores := func() {
 		playerScore.SetText(fmt.Sprintf("Your cards: %d", len(player1.Cards)))
