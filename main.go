@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image/color"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -13,11 +14,29 @@ import (
 
 func main() {
 	// Initialize the game
-	player1, cpu := StartGame()
+	player1, cpu, setupMessages := StartGame()
 
 	myApp := app.New()
 	myWindow := myApp.NewWindow("War Card Game")
 	myWindow.Resize(fyne.NewSize(800, 600))
+
+	// NOTIFICATION SYSTEM for setup messages
+	notificationLabel := widget.NewLabel("")
+	notificationLabel.Alignment = fyne.TextAlignCenter
+	notificationLabel.TextStyle.Bold = true
+	showNotification := func(message string) {
+		notificationLabel.SetText(message)
+		notificationLabel.Show()
+		notificationLabel.Refresh()
+
+		// Don't use a goroutine here - schedule the hide with fyne.Do instead
+		go func() {
+			time.Sleep(2 * time.Second)
+			fyne.Do(func() {
+				notificationLabel.Hide()
+			})
+		}()
+	}
 
 	// CARD COUNT LABELS
 	cpuCardCount := widget.NewLabel(fmt.Sprintf("%d", len(cpu.Cards)))
@@ -60,6 +79,7 @@ func main() {
 	// SIMPLE ENHANCED INITIAL DISPLAY - BIGGER!
 	initialDisplay := container.NewCenter(
 		container.NewVBox(
+			notificationLabel,
 			container.NewCenter(
 				func() *canvas.Text {
 					sword := canvas.NewText("⚔️", color.White)
@@ -140,7 +160,7 @@ func main() {
 		playButton.Hide()
 		initialDisplay.Hide()
 		battleArea.Show()
-		hintLabel.Show() // Show hint when game starts
+		hintLabel.Show()
 	})
 
 	// CREATE CLICKABLE CARD using effects.go
@@ -175,5 +195,21 @@ func main() {
 	contentWithBackground := container.NewStack(background, container.NewPadded(content))
 	myWindow.SetContent(contentWithBackground)
 
+	// Start the notification display after window is ready
+	go func() {
+		// Wait a moment for window to be ready
+		time.Sleep(1 * time.Second) // Increased wait time
+
+		for _, msg := range setupMessages {
+			// Capture the message in a local variable to avoid closure issues
+			message := msg
+			fyne.Do(func() {
+				showNotification(message)
+			})
+			time.Sleep(3 * time.Second) // Increased delay between messages
+		}
+	}()
+
 	myWindow.ShowAndRun()
+
 }

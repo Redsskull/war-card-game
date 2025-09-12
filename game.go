@@ -5,18 +5,20 @@ import (
 	"math/rand"
 )
 
-func StartGame() (*Player, *Player) {
+func StartGame() (*Player, *Player, []string) {
+	messages := []string{}
+
 	// 1. Create two players
 	player1 := Player{Name: "Player 1", Cards: []Card{}}
 	cpu := Player{Name: "CPU", Cards: []Card{}}
 
 	// 2. Create a deck
 	deck := NewDeck()
-	fmt.Printf("Deck created with %d cards\n", len(deck.Cards))
+	messages = append(messages, fmt.Sprintf("Deck created with %d cards", len(deck.Cards)))
 
 	// 3. Shuffle the deck
 	deck.Shuffle()
-	fmt.Println("Deck shuffled!")
+	messages = append(messages, "Deck shuffled!")
 
 	// 4. Deal cards evenly to both players, give leftover to random player
 	totalCards := len(deck.Cards)
@@ -34,15 +36,14 @@ func StartGame() (*Player, *Player) {
 		cardIndex := cardsPerPlayer*2 + i // Index 54 for the leftover card
 		if rand.Intn(2) == 0 {            // Random 0 or 1
 			player1.AddCard(deck.Cards[cardIndex])
-			fmt.Println("Player got the bonus card!")
+			messages = append(messages, "Player got the bonus card!")
 		} else {
 			cpu.AddCard(deck.Cards[cardIndex])
-			fmt.Println("CPU got the bonus card!")
+			messages = append(messages, "CPU got the bonus card!")
 		}
 	}
 
-	return &player1, &cpu // Return pointers to the players
-
+	return &player1, &cpu, messages
 }
 
 func PlayRound(player1 *Player, cpu *Player) (Card, Card, string) {
@@ -106,11 +107,10 @@ func putDownWarCards(player *Player) ([]Card, Card) {
 	// Put down up to 4 cards, or whatever the player has
 	cardsToPlay := min(4, len(player.Cards))
 
-	for i := 0; i < cardsToPlay; i++ {
+	for range cardsToPlay {
 		card := player.PlayCard()
 		warCards = append(warCards, card)
-		lastCard = card // Keep track of the last one
+		lastCard = card
 	}
-
 	return warCards, lastCard
 }
