@@ -114,3 +114,30 @@ func putDownWarCards(player *Player) ([]Card, Card) {
 	}
 	return warCards, lastCard
 }
+
+// Check if the game is over and return winner info
+func IsGameOver(player1, cpu *Player) (bool, string) {
+	if !player1.HasCards() {
+		return true, "GAME OVER!\nCPU WINS! 🤖"
+	} else if !cpu.HasCards() {
+		return true, "GAME OVER!\nYOU WIN! 🏆"
+	}
+	return false, ""
+}
+
+// Execute a complete game round and return all necessary info for UI updates
+func ExecuteGameRound(player1, cpu *Player) (Card, Card, string, bool, string) {
+	// Check if game can continue
+	if !player1.HasCards() || !cpu.HasCards() {
+		gameOver, winner := IsGameOver(player1, cpu)
+		return Card{}, Card{}, "", gameOver, winner
+	}
+
+	// Play the round
+	playerCard, cpuCard, result := PlayRound(player1, cpu)
+
+	// Check if game is now over
+	gameOver, winner := IsGameOver(player1, cpu)
+
+	return playerCard, cpuCard, result, gameOver, winner
+}

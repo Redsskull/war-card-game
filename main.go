@@ -126,12 +126,13 @@ func main() {
 
 	// PLAY ROUND LOGIC
 	executeRound := func() {
-		if !player1.HasCards() || !cpu.HasCards() {
-			return
+		playerCard, cpuCard, result, gameOver, winner := ExecuteGameRound(player1, cpu)
+
+		if gameOver && winner == "" {
+			return // No cards to play
 		}
 
-		playerCard, cpuCard, result := PlayRound(player1, cpu)
-
+		// UI updates
 		playerCardImage.File = playerCard.GetImageFilename()
 		playerCardImage.Show()
 		playerCardImage.Refresh()
@@ -144,11 +145,8 @@ func main() {
 		gameResult.Show()
 		updateScores()
 
-		if !player1.HasCards() {
-			gameResult.SetText("GAME OVER!\nCPU WINS! 🤖")
-			hintLabel.Hide()
-		} else if !cpu.HasCards() {
-			gameResult.SetText("GAME OVER!\nYOU WIN! 🏆")
+		if gameOver {
+			gameResult.SetText(winner)
 			hintLabel.Hide()
 		}
 	}
