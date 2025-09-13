@@ -18,27 +18,29 @@ func main() {
 
 	myApp := app.New()
 	myWindow := myApp.NewWindow("War Card Game")
-	myWindow.Resize(fyne.NewSize(800, 600))
+	myWindow.Resize(fyne.NewSize(1920, 1080))
 
 	// NOTIFICATION SYSTEM for setup messages
-	notificationLabel := widget.NewLabel("")
-	notificationLabel.Alignment = fyne.TextAlignCenter
-	notificationLabel.TextStyle.Bold = true
-	showNotification := func(message string) {
-		notificationLabel.SetText(message)
-		notificationLabel.Show()
-		notificationLabel.Refresh()
+	notificationText := canvas.NewText("", color.White)
+	notificationText.Alignment = fyne.TextAlignCenter
+	notificationText.TextStyle.Bold = true
+	notificationText.TextSize = 18
+	notificationText.Hide()
 
-		// Don't use a goroutine here - schedule the hide with fyne.Do instead
+	showNotification := func(message string) {
+		notificationText.Text = message
+		notificationText.Show()
+		notificationText.Refresh()
+
 		go func() {
 			time.Sleep(2 * time.Second)
 			fyne.Do(func() {
-				notificationLabel.Hide()
+				notificationText.Hide()
 			})
 		}()
 	}
 
-	// CARD COUNT LABELS
+	// CARD COUNT LABELS - Keep as widget.Label since they need dynamic updates
 	cpuCardCount := widget.NewLabel(fmt.Sprintf("%d", len(cpu.Cards)))
 	cpuCardCount.Alignment = fyne.TextAlignCenter
 	cpuCardCount.TextStyle.Bold = true
@@ -47,43 +49,47 @@ func main() {
 	playerCardCount.Alignment = fyne.TextAlignCenter
 	playerCardCount.TextStyle.Bold = true
 
-	// PLAYED CARD IMAGES (hidden initially)
+	// PLAYED CARD IMAGES (hidden initially) - MUCH LARGER
 	playerCardImage := canvas.NewImageFromFile("Cards/card_joker.png")
-	playerCardImage.SetMinSize(fyne.NewSize(80, 110))
+	playerCardImage.SetMinSize(fyne.NewSize(250, 350))
 	playerCardImage.FillMode = canvas.ImageFillContain
 	playerCardImage.Hide()
 
 	cpuCardImage := canvas.NewImageFromFile("Cards/card_joker.png")
-	cpuCardImage.SetMinSize(fyne.NewSize(80, 110))
+	cpuCardImage.SetMinSize(fyne.NewSize(250, 350))
 	cpuCardImage.FillMode = canvas.ImageFillContain
 	cpuCardImage.Hide()
 
-	// HAND CARD BACKS
+	// HAND CARD BACKS - LARGER
 	playerHandImage := canvas.NewImageFromFile("Cards/card_back_suits.png")
-	playerHandImage.SetMinSize(fyne.NewSize(60, 80))
+	playerHandImage.SetMinSize(fyne.NewSize(180, 300))
 	playerHandImage.FillMode = canvas.ImageFillContain
 
 	cpuHandImage := canvas.NewImageFromFile("Cards/card_back_suits_dark.png")
-	cpuHandImage.SetMinSize(fyne.NewSize(60, 80))
+	cpuHandImage.SetMinSize(fyne.NewSize(180, 300))
 	cpuHandImage.FillMode = canvas.ImageFillContain
 
-	// TITLE
-	gameTitle := widget.NewLabel("🃏 War Card Game")
+	// TITLE - Using canvas.Text for larger size
+	gameTitle := canvas.NewText("War Card Game", color.White)
 	gameTitle.TextStyle.Bold = true
+	gameTitle.TextSize = 22
+	gameTitle.Alignment = fyne.TextAlignCenter
 
-	// GAME RESULT (hidden initially)
-	gameResult := widget.NewLabel("")
+	// GAME RESULT (hidden initially) - Using canvas.Text for larger size
+	gameResult := canvas.NewText("", color.White)
 	gameResult.Alignment = fyne.TextAlignCenter
+	gameResult.TextSize = 20
+	gameResult.TextStyle.Bold = true
 	gameResult.Hide()
 
-	// SIMPLE ENHANCED INITIAL DISPLAY - BIGGER!
+	// ENHANCED INITIAL DISPLAY
 	initialDisplay := container.NewCenter(
 		container.NewVBox(
-			notificationLabel,
+			notificationText,
 			container.NewCenter(
 				func() *canvas.Text {
 					sword := canvas.NewText("⚔️", color.White)
-					sword.TextSize = 48
+					sword.TextSize = 64
 					sword.TextStyle.Bold = true
 					sword.Alignment = fyne.TextAlignCenter
 					return sword
@@ -91,26 +97,42 @@ func main() {
 
 			container.NewCenter(
 				container.NewHBox(
-					widget.NewLabel("👤 PLAYER"),
+					func() *canvas.Text {
+						player := canvas.NewText("👤 PLAYER", color.White)
+						player.TextSize = 24
+						player.TextStyle.Bold = true
+						return player
+					}(),
 					func() *canvas.Text {
 						vs := canvas.NewText("🆚", color.White)
-						vs.TextSize = 36
+						vs.TextSize = 48
 						vs.TextStyle.Bold = true
 						vs.Alignment = fyne.TextAlignCenter
 						return vs
 					}(),
-					widget.NewLabel("🤖 CPU"))),
+					func() *canvas.Text {
+						cpu := canvas.NewText("🤖 CPU", color.White)
+						cpu.TextSize = 24
+						cpu.TextStyle.Bold = true
+						return cpu
+					}(),
+				)),
 
 			container.NewCenter(
-				func() *widget.Label {
-					ready := widget.NewLabel("Ready for Battle!")
+				func() *canvas.Text {
+					ready := canvas.NewText("Ready for Battle!", color.White)
 					ready.TextStyle.Bold = true
+					ready.TextSize = 20
+					ready.Alignment = fyne.TextAlignCenter
 					return ready
 				}())))
 
-	// BATTLE AREA (hidden initially)
+	// BATTLE AREA (hidden initially) - Using canvas.Text for larger VS
+	vsText := canvas.NewText("  VS  ", color.White)
+	vsText.TextSize = 28
+	vsText.TextStyle.Bold = true
 	battleArea := container.NewCenter(
-		container.NewHBox(playerCardImage, widget.NewLabel("  VS  "), cpuCardImage))
+		container.NewHBox(playerCardImage, vsText, cpuCardImage))
 	battleArea.Hide()
 
 	// UPDATE SCORES FUNCTION
@@ -119,10 +141,12 @@ func main() {
 		playerCardCount.SetText(fmt.Sprintf("%d", len(player1.Cards)))
 	}
 
-	// Add visual hint
-	hintLabel := widget.NewLabel("👆 Click card to play!")
-	hintLabel.Alignment = fyne.TextAlignCenter
-	hintLabel.Hide()
+	// Add visual hint - Using canvas.Text for larger size
+	hintText := canvas.NewText("👆 Click your deck to play!", color.White)
+	hintText.Alignment = fyne.TextAlignCenter
+	hintText.TextStyle.Bold = true
+	hintText.TextSize = 18
+	hintText.Hide()
 
 	// PLAY ROUND LOGIC
 	executeRound := func() {
@@ -141,73 +165,73 @@ func main() {
 		cpuCardImage.Show()
 		cpuCardImage.Refresh()
 
-		gameResult.SetText(result)
+		gameResult.Text = result
 		gameResult.Show()
+		gameResult.Refresh()
 		updateScores()
 
 		if gameOver {
-			gameResult.SetText(winner)
-			hintLabel.Hide()
+			gameResult.Text = winner
+			hintText.Hide()
 		}
 	}
 
 	// START GAME BUTTON
 	var playButton *widget.Button
-	playButton = widget.NewButton("Start Game", func() {
+	playButton = widget.NewButton("🎮 Start Game", func() {
 		gameTitle.Hide()
 		playButton.Hide()
 		initialDisplay.Hide()
 		battleArea.Show()
-		hintLabel.Show()
+		hintText.Show()
 	})
+	playButton.Resize(fyne.NewSize(200, 50))
 
-	// CREATE CLICKABLE CARD using effects.go
+	// CREATE CLICKABLE CARD using the fixed effects.go
 	clickablePlayerCard := NewClickableCard(playerHandImage, playerCardCount, func() {
 		if !gameTitle.Visible() && battleArea.Visible() {
 			executeRound()
 		}
 	})
 
-	// LAYOUT
-	topArea := container.NewCenter(
-		container.NewVBox(
-			gameTitle,
-			widget.NewSeparator(),
-			container.NewStack(cpuHandImage, cpuCardCount)))
+	// LAYOUT with tighter spacing - remove gaps
+	topArea := container.NewVBox(
+		container.NewCenter(gameTitle),
+		// widget.NewSeparator(),
+		cardBackWithCount(cpuHandImage, cpuCardCount),
+	)
 
 	middleArea := container.NewCenter(
 		container.NewVBox(
 			container.NewStack(initialDisplay, battleArea),
 			playButton,
-			gameResult))
+			gameResult,
+		))
 
-	bottomArea := container.NewCenter(
-		container.NewVBox(
-			hintLabel,
-			clickablePlayerCard)) // Use the clickable card widget from effects.go!
+	bottomArea := container.NewVBox(
+		hintText,
+		clickablePlayerCard,
+	)
 
 	content := container.NewBorder(topArea, bottomArea, nil, nil, middleArea)
 
-	// FINAL DISPLAY
+	// FINAL DISPLAY with better background
 	background := canvas.NewRectangle(color.RGBA{70, 130, 180, 255})
-	contentWithBackground := container.NewStack(background, container.NewPadded(content))
+	contentWithBackground := container.NewStack(background, content)
 	myWindow.SetContent(contentWithBackground)
 
 	// Start the notification display after window is ready
 	go func() {
-		// Wait a moment for window to be ready
-		time.Sleep(1 * time.Second) // Increased wait time
+		time.Sleep(1 * time.Second)
 
 		for _, msg := range setupMessages {
-			// Capture the message in a local variable to avoid closure issues
 			message := msg
 			fyne.Do(func() {
 				showNotification(message)
 			})
-			time.Sleep(3 * time.Second) // Increased delay between messages
+			time.Sleep(3 * time.Second)
 		}
 	}()
 
 	myWindow.ShowAndRun()
-
 }
