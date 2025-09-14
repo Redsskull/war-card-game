@@ -118,9 +118,9 @@ func putDownWarCards(player *Player) ([]Card, Card) {
 // Check if the game is over and return winner info
 func IsGameOver(player1, cpu *Player) (bool, string) {
 	if !player1.HasCards() {
-		return true, "GAME OVER!\nCPU WINS! 🤖"
+		return true, "GAME OVER! CPU WINS! 🤖"
 	} else if !cpu.HasCards() {
-		return true, "GAME OVER!\nYOU WIN! 🏆"
+		return true, "GAME OVER! YOU WIN! 🏆"
 	}
 	return false, ""
 }

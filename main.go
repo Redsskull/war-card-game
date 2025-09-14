@@ -61,7 +61,7 @@ func main() {
 	cpuCardImage.Hide()
 
 	// HAND CARD BACKS - LARGER
-	playerHandImage := canvas.NewImageFromFile("Cards/card_back_suits.png")
+	playerHandImage := canvas.NewImageFromFile("Cards/card_back_ suits_blue.png")
 	playerHandImage.SetMinSize(fyne.NewSize(180, 300))
 	playerHandImage.FillMode = canvas.ImageFillContain
 
@@ -215,8 +215,8 @@ func main() {
 
 	content := container.NewBorder(topArea, bottomArea, nil, nil, middleArea)
 
-	// FINAL DISPLAY with better background
-	background := canvas.NewRectangle(color.RGBA{70, 130, 180, 255})
+	// FINAL DISPLAY with beautiful purple background
+	background := canvas.NewRectangle(color.RGBA{102, 51, 153, 255})
 	contentWithBackground := container.NewStack(background, content)
 	myWindow.SetContent(contentWithBackground)
 
@@ -232,6 +232,17 @@ func main() {
 			time.Sleep(3 * time.Second)
 		}
 	}()
+
+	// track fullscreen state
+	isFull := false
+
+	// Listen for key events on the window's canvas
+	myWindow.Canvas().SetOnTypedKey(func(ev *fyne.KeyEvent) {
+		if ev.Name == fyne.KeyF11 {
+			isFull = !isFull
+			myWindow.SetFullScreen(isFull)
+		}
+	})
 
 	myWindow.ShowAndRun()
 }
