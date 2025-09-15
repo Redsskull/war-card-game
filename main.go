@@ -40,14 +40,16 @@ func main() {
 		}()
 	}
 
-	// CARD COUNT LABELS - Keep as widget.Label since they need dynamic updates
-	cpuCardCount := widget.NewLabel(fmt.Sprintf("%d", len(cpu.Cards)))
+	// CARD COUNT LABELS
+	cpuCardCount := canvas.NewText(fmt.Sprintf("%d", len(cpu.Cards)), color.White)
 	cpuCardCount.Alignment = fyne.TextAlignCenter
 	cpuCardCount.TextStyle.Bold = true
+	cpuCardCount.TextSize = 20
 
-	playerCardCount := widget.NewLabel(fmt.Sprintf("%d", len(player1.Cards)))
+	playerCardCount := canvas.NewText(fmt.Sprintf("%d", len(player1.Cards)), color.White)
 	playerCardCount.Alignment = fyne.TextAlignCenter
 	playerCardCount.TextStyle.Bold = true
+	playerCardCount.TextSize = 20
 
 	// PLAYED CARD IMAGES (hidden initially) - MUCH LARGER
 	playerCardImage := canvas.NewImageFromFile("Cards/card_joker.png")
@@ -135,10 +137,12 @@ func main() {
 		container.NewHBox(playerCardImage, vsText, cpuCardImage))
 	battleArea.Hide()
 
-	// UPDATE SCORES FUNCTION
+	// UPDATE SCORES FUNCTION - Updated for canvas.Text
 	updateScores := func() {
-		cpuCardCount.SetText(fmt.Sprintf("%d", len(cpu.Cards)))
-		playerCardCount.SetText(fmt.Sprintf("%d", len(player1.Cards)))
+		cpuCardCount.Text = fmt.Sprintf("%d", len(cpu.Cards))
+		cpuCardCount.Refresh()
+		playerCardCount.Text = fmt.Sprintf("%d", len(player1.Cards))
+		playerCardCount.Refresh()
 	}
 
 	// Add visual hint - Using canvas.Text for larger size
@@ -187,8 +191,8 @@ func main() {
 	})
 	playButton.Resize(fyne.NewSize(200, 50))
 
-	// CREATE CLICKABLE CARD using the fixed effects.go
-	clickablePlayerCard := NewClickableCard(playerHandImage, playerCardCount, func() {
+	// CREATE CLICKABLE CARD (simplified - no count parameter)
+	clickablePlayerCard := NewClickableCard(playerHandImage, func() {
 		if !gameTitle.Visible() && battleArea.Visible() {
 			executeRound()
 		}
@@ -197,8 +201,7 @@ func main() {
 	// LAYOUT with tighter spacing - remove gaps
 	topArea := container.NewVBox(
 		container.NewCenter(gameTitle),
-		// widget.NewSeparator(),
-		cardBackWithCount(cpuHandImage, cpuCardCount),
+		container.NewStack(cpuHandImage, cpuCardCount),
 	)
 
 	middleArea := container.NewCenter(
@@ -210,7 +213,7 @@ func main() {
 
 	bottomArea := container.NewVBox(
 		hintText,
-		clickablePlayerCard,
+		container.NewStack(clickablePlayerCard, playerCardCount),
 	)
 
 	content := container.NewBorder(topArea, bottomArea, nil, nil, middleArea)
@@ -231,6 +234,18 @@ func main() {
 			})
 			time.Sleep(3 * time.Second)
 		}
+	}()
+
+	// I tried in so many different ways to make the score appear exactly where I want it to. Go func(goroutine)
+	// is the only way that worked for me
+	go func() {
+		time.Sleep(100 * time.Millisecond)
+		fyne.Do(func() {
+			cpuCardCount.Move(fyne.NewPos(1, -5))
+			playerCardCount.Move(fyne.NewPos(1, -10))
+			cpuCardCount.Refresh()
+			playerCardCount.Refresh()
+		})
 	}()
 
 	// track fullscreen state

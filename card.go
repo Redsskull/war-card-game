@@ -7,20 +7,20 @@ import (
 // Card represents a playing card with a number and suit.
 type Card struct {
 	Value int    // 2-17
-	Suit  string // Hearts, Diamonds, Clubs, Spades, and your special suits
+	Suit  string // Hearts, Diamonds, Clubs, Spades, and special suits
 }
 
 // GetDisplayValue returns the card value as it appears on cards
 func (c Card) GetDisplayValue() string {
 	switch c.Value {
-	case 14:
-		return "Ace"
-	case 13:
-		return "King"
-	case 12:
-		return "Queen"
 	case 11:
 		return "Jack"
+	case 12:
+		return "Queen"
+	case 13:
+		return "King"
+	case 14:
+		return "Ace"
 	case 15:
 		return "Joker" // Normal Joker
 	case 16:
@@ -29,28 +29,6 @@ func (c Card) GetDisplayValue() string {
 		return "Black Joker" // Black Joker
 	default:
 		return fmt.Sprintf("%d", c.Value)
-	}
-}
-
-// GetSuitSymbol returns the symbol for the suit
-func (c Card) GetSuitSymbol() string {
-	switch c.Suit {
-	case "Hearts":
-		return "♥"
-	case "Diamonds":
-		return "♦"
-	case "Clubs":
-		return "♣"
-	case "Spades":
-		return "♠"
-	case "Joker":
-		return "🌈" // Rainbow for colorful
-	case "RedJoker":
-		return "🔴" // Red circle
-	case "BlackJoker":
-		return "🖤" // Black heart
-	default:
-		return "?"
 	}
 }
 
