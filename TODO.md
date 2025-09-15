@@ -55,51 +55,106 @@
 
 ## WHAT'S NEXT 🚀
 ### PHASE 6: Critical UI Improvements 🎯 HIGH PRIORITY
-- [ ] **SCALING ISSUE**: UI too small on large screens (1080p/1440p) - Need larger elements
-  - [ ] Scale up card images (currently 60x80, 80x110)
-  - [ ] Increase font sizes for labels and text
-  - [ ] Expand window size and element spacing
-  - [ ] Test on different screen resolutions
-  - [ ] Make UI responsive to screen size
+- [ x] **SCALING ISSUE**: UI too small on large screens (1080p/1440p) - Need larger elements
+  - [ x] Scale up card images (currently 60x80, 80x110)
+  - [ x] Increase font sizes for labels and text
+  - [ x] Expand window size and element spacing
+  - [ x] Test on different screen resolutions
+  - [x ] Make UI responsive to screen size
 
-- [ ] **CARD BACK COLOR**: Player cards showing red backs instead of blue
-  - [ ] Currently using `card_back_suits.png` (red) for player
-  - [ ] Need to either:
-    - [ ] Find/create blue card back image, OR
-    - [ ] Programmatically tint the existing card back blue, OR
-    - [ ] Use different card back asset for player vs CPU
-  - [ ] Ensure visual distinction: Player = Blue, CPU = Red/Dark
+- [x ] **CARD BACK COLOR**: Player cards showing red backs instead of blue
+  - [x ] Currently using `card_back_suits.png` (red) for player
+  - [ x] Need to either:
+    - [x ] Find/create blue card back image
 
-### PHASE 7: Future Enhancements (Lower Priority)
-- [ ] Add win/lose animations
-- [ ] Add card dealing animations
-- [ ] Add sound effects
-- [ ] Add game statistics tracking
-- [ ] Add different card back themes
+## 🎯 WEEK 2 GOALS - SHIP IT!
+**Theme: Polish, Fix Bugs, and Add Fun Features**
+*Remember: Done is better than perfect for your first project!*
 
-## CURRENT ISSUES TO FIX 🔧
-1. **UI Scaling Problem**: Everything appears tiny on high-resolution screens
-2. **Card Back Mismatch**: Player should have blue backs, not red
+---
+
+## 🔥 QUICK WINS (Day 1-2) - Start Here!
+
+### 1. Fix Blue Card Back Bug
+- [x ]Blue card back filename has a space!
+  - Current: `"Cards/card_back_ suits_blue.png"` (space after underscore)
+  - Fix in `main.go` line 65: Change to `"Cards/card_back_suits_blue.png"` (no space)
+- [ x] Test that player cards now show blue backs
+
+### 2. Add Game Statistics
+- [ x] Create `stats.go` file with simple stats tracking:
+  ```go
+  type GameStats struct {
+      TotalRounds    int
+      WarsCount      int
+      LongestWar     int  // How many cards in biggest war
+      CurrentStreak  int  // Consecutive wins
+      BestStreak     int
+  }
+  - Didn't need to do this. added them as variables to Fyne in main.go and upped the count
 
 
-## TECHNICAL ACHIEVEMENTS 📝
-- ✅ Card-to-filename mapping system working perfectly
-- ✅ Responsive image sizing without magic numbers
-- ✅ Hidden placeholders with show/hide system
-- ✅ Stable layout that doesn't shift with text changes
-- ✅ All 55 cards displaying correctly including special jokers
-- ✅ **Custom Fyne widgets with hover and click detection** ⭐ NEW!
-- ✅ **Modular code architecture with separated concerns** ⭐ NEW!
-- ✅ **Professional UI/UX without framework limitations** ⭐ NEW!
+### 3. Add Simple Menu System (3-4 hours) 🎮
+- [ ] Create main menu with:
+  - Start New Game button
+  - How to Play button (shows rules)
+  - Quit button
+- [ ] Add "New Game" button after game ends
+- [ ] Add "Return to Menu" option
 
-## CELEBRATION NOTES 🎉
-- **First GUI project with images - SUCCESS!**
-- **Learned responsive design principles**
-- **Problem-solved layout and positioning issues**
-- **Working card game with actual card graphics!**
-- **🏆 MAJOR WIN: Created custom clickable cards with perfect hover effects!**
-- **🏆 OVERCAME: Fyne's button limitations with elegant custom solution!**
-- **🏆 CLEAN CODE: Proper Go project structure with separated UI components!**
+### 4. Add Speed Mode (4-5 hours) ⚡
+- [ ] Add "Auto-Play" toggle button
+- [ ] When enabled, automatically play a round every 1.5 seconds
+- [ ] Use goroutine with ticker (you already know goroutines!)
+- [ ] Add pause/resume functionality
+- [ ] Show "SPEED MODE" indicator when active
+
+### 5. Improve War Display (3-4 hours) 🎴
+- [ ] Show all cards involved in a war (face down)
+- [ ] Display "WAR! 3 cards at stake!" message
+- [ ] Add dramatic pause before revealing war winner
+- [ ] Count total cards won in each war
+
+### 6. Add Simple Animations (4-5 hours) 🎨
+- [ ] Card slide animation when playing (move from deck to center)
+- [ ] Cards slide to winner's pile after round
+- [ ] Simple bounce effect when winning a war
+- [ ] Use Fyne's animation API (keep it simple!)
+
+---
+
+## 🎯 STRETCH GOALS (Day 5-6) - If Time Permits
+
+### 7. Simple Sound Effects (Optional - May be complex) 🔊
+**Note: Fyne doesn't have built-in audio, this is advanced!**
+- [ ] Research beep package or oto for simple sounds
+- [ ] Add card flip sound
+- [ ] Add winning sound
+- [ ] Add war declaration sound
+- [ ] Keep it simple - even just system beep is fine!
+
+### 8. Save Game State (3-4 hours) 💾
+- [ ] Save current game to JSON file
+- [ ] Load saved game on startup
+- [ ] Add "Save & Quit" option
+- [ ] Store in `~/.war-game/save.json`
+
+### 9. Add Themes (2-3 hours) 🎨
+- [ ] Create `themes.go`
+- [ ] Add dark/light mode toggle
+- [ ] Change background colors (purple, blue, green)
+- [ ] Save theme preference
+
+---
+
+## 📝 FINAL DAY (Day 7) - SHIP IT!
+
+### 10. Final Polish & Documentation ✅
+- [ ] Update README.md with:
+  - How to build and run
+  - Screenshots
+  - What you learned
+  - Technologies used
 
 ---
 ## FINAL RESULT ✨

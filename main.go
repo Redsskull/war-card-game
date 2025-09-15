@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image/color"
+	"strings"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -63,7 +64,7 @@ func main() {
 	cpuCardImage.Hide()
 
 	// HAND CARD BACKS - LARGER
-	playerHandImage := canvas.NewImageFromFile("Cards/card_back_ suits_blue.png")
+	playerHandImage := canvas.NewImageFromFile("Cards/card_back_suits_blue.png")
 	playerHandImage.SetMinSize(fyne.NewSize(180, 300))
 	playerHandImage.FillMode = canvas.ImageFillContain
 
@@ -152,6 +153,21 @@ func main() {
 	hintText.TextSize = 18
 	hintText.Hide()
 
+	// Stats Display
+	leftStats := canvas.NewText("Wars: 0", color.White)
+	leftStats.Alignment = fyne.TextAlignLeading
+	leftStats.TextSize = 34
+	leftStats.TextStyle.Bold = true
+
+	rightStats := canvas.NewText("Longest War: 0", color.White)
+	rightStats.Alignment = fyne.TextAlignTrailing
+	rightStats.TextSize = 34
+	rightStats.TextStyle.Bold = true
+
+	// Keep track of stats
+	warsThisGame := 0
+	longestWar := 0
+
 	// PLAY ROUND LOGIC
 	executeRound := func() {
 		playerCard, cpuCard, result, gameOver, winner := ExecuteGameRound(player1, cpu)
@@ -173,6 +189,21 @@ func main() {
 		gameResult.Show()
 		gameResult.Refresh()
 		updateScores()
+
+		// ADD THIS after the existing playerCardImage and cpuCardImage updates:
+		if strings.Contains(result, "WAR!") {
+			warsThisGame++
+			leftStats.Text = fmt.Sprintf("Wars: %d", warsThisGame)
+			leftStats.Refresh()
+
+			// Count cards in this war (rough estimate)
+			warSize := strings.Count(result, "WAR!") * 4
+			if warSize > longestWar {
+				longestWar = warSize
+				rightStats.Text = fmt.Sprintf("Longest: %d", longestWar)
+				rightStats.Refresh()
+			}
+		}
 
 		if gameOver {
 			gameResult.Text = winner
@@ -198,19 +229,30 @@ func main() {
 		}
 	})
 
-	// LAYOUT with tighter spacing - remove gaps
+	// LAYOUT
+
+	// TOP
 	topArea := container.NewVBox(
 		container.NewCenter(gameTitle),
 		container.NewStack(cpuHandImage, cpuCardCount),
 	)
 
-	middleArea := container.NewCenter(
-		container.NewVBox(
-			container.NewStack(initialDisplay, battleArea),
-			playButton,
-			gameResult,
-		))
+	// MIDDLE
+	// Store the current middle content
+	currentMiddleContent := container.NewVBox(
+		container.NewStack(initialDisplay, battleArea),
+		playButton,
+		gameResult,
+	)
 
+	// NEW middleArea with stats on sides:
+	middleArea := container.NewBorder(
+		nil, nil, // no top/bottom
+		leftStats,  // left side
+		rightStats, // right side
+		container.NewCenter(currentMiddleContent)) // center content
+
+	// BOTTOM
 	bottomArea := container.NewVBox(
 		hintText,
 		container.NewStack(clickablePlayerCard, playerCardCount),
