@@ -82,16 +82,7 @@
 - [ x] Test that player cards now show blue backs
 
 ### 2. Add Game Statistics
-- [ x] Create `stats.go` file with simple stats tracking:
-  ```go
-  type GameStats struct {
-      TotalRounds    int
-      WarsCount      int
-      LongestWar     int  // How many cards in biggest war
-      CurrentStreak  int  // Consecutive wins
-      BestStreak     int
-  }
-  - Didn't need to do this. added them as variables to Fyne in main.go and upped the count
+- The stats work, but I had to limit the text length for it. Need to investigate
 
 
 ### 3. Add Simple Menu System (3-4 hours) 🎮

@@ -159,7 +159,7 @@ func main() {
 	leftStats.TextSize = 34
 	leftStats.TextStyle.Bold = true
 
-	rightStats := canvas.NewText("Longest War: 0", color.White)
+	rightStats := canvas.NewText("Long: 0", color.White)
 	rightStats.Alignment = fyne.TextAlignTrailing
 	rightStats.TextSize = 34
 	rightStats.TextStyle.Bold = true
@@ -190,17 +190,17 @@ func main() {
 		gameResult.Refresh()
 		updateScores()
 
-		// ADD THIS after the existing playerCardImage and cpuCardImage updates:
+		// Count the stats
 		if strings.Contains(result, "WAR!") {
 			warsThisGame++
-			leftStats.Text = fmt.Sprintf("Wars: %d", warsThisGame)
+			// Make both texts exactly the same length for testing
+			leftStats.Text = fmt.Sprintf("Wars: %-3d", warsThisGame) // "Wars: 1  " (padded to 3 digits)
 			leftStats.Refresh()
 
-			// Count cards in this war (rough estimate)
 			warSize := strings.Count(result, "WAR!") * 4
 			if warSize > longestWar {
 				longestWar = warSize
-				rightStats.Text = fmt.Sprintf("Longest: %d", longestWar)
+				rightStats.Text = fmt.Sprintf("Long: %-3d", longestWar) // "Long: 0  " (same total length)
 				rightStats.Refresh()
 			}
 		}
