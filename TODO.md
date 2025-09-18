@@ -82,7 +82,7 @@
 - [ x] Test that player cards now show blue backs
 
 ### 2. Add Game Statistics
-- The stats work, but I had to limit the text length for it. Need to investigate
+- [ x]The stats work, but I had to limit the text length for it. Need to investigate I consider this good enough.
 
 
 ### 3. Add Simple Menu System (3-4 hours) 🎮

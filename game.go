@@ -102,7 +102,7 @@ func PlayRound(player1 *Player, cpu *Player) (Card, Card, string) {
 // Helper function to handle war card placement
 func putDownWarCards(player *Player) ([]Card, Card) {
 	warCards := []Card{}
-	var lastCard Card
+	lastCard := Card{}
 
 	// Put down up to 4 cards, or whatever the player has
 	cardsToPlay := min(4, len(player.Cards))
@@ -125,7 +125,8 @@ func IsGameOver(player1, cpu *Player) (bool, string) {
 	return false, ""
 }
 
-// Execute a complete game round and return all necessary info for UI updates
+// ExecuteGameRound plays one complete round and returns the cards played,
+// result message, and whether the game is over with winner info.
 func ExecuteGameRound(player1, cpu *Player) (Card, Card, string, bool, string) {
 	// Check if game can continue
 	if !player1.HasCards() || !cpu.HasCards() {

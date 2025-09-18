@@ -21,7 +21,7 @@ func main() {
 	myWindow := myApp.NewWindow("War Card Game")
 	myWindow.Resize(fyne.NewSize(1920, 1080))
 
-	// NOTIFICATION SYSTEM for setup messages
+	// setup messages
 	notificationText := canvas.NewText("", color.White)
 	notificationText.Alignment = fyne.TextAlignCenter
 	notificationText.TextStyle.Bold = true
@@ -41,7 +41,7 @@ func main() {
 		}()
 	}
 
-	// CARD COUNT LABELS
+	// Carc count labels
 	cpuCardCount := canvas.NewText(fmt.Sprintf("%d", len(cpu.Cards)), color.White)
 	cpuCardCount.Alignment = fyne.TextAlignCenter
 	cpuCardCount.TextStyle.Bold = true
@@ -52,7 +52,7 @@ func main() {
 	playerCardCount.TextStyle.Bold = true
 	playerCardCount.TextSize = 20
 
-	// PLAYED CARD IMAGES (hidden initially) - MUCH LARGER
+	// Played (hidden initially)
 	playerCardImage := canvas.NewImageFromFile("Cards/card_joker.png")
 	playerCardImage.SetMinSize(fyne.NewSize(250, 350))
 	playerCardImage.FillMode = canvas.ImageFillContain
@@ -63,7 +63,7 @@ func main() {
 	cpuCardImage.FillMode = canvas.ImageFillContain
 	cpuCardImage.Hide()
 
-	// HAND CARD BACKS - LARGER
+	// Hand cards (hidden initially)
 	playerHandImage := canvas.NewImageFromFile("Cards/card_back_suits_blue.png")
 	playerHandImage.SetMinSize(fyne.NewSize(180, 300))
 	playerHandImage.FillMode = canvas.ImageFillContain
@@ -85,7 +85,7 @@ func main() {
 	gameResult.TextStyle.Bold = true
 	gameResult.Hide()
 
-	// ENHANCED INITIAL DISPLAY
+	// Initial display
 	initialDisplay := container.NewCenter(
 		container.NewVBox(
 			notificationText,
@@ -138,7 +138,7 @@ func main() {
 		container.NewHBox(playerCardImage, vsText, cpuCardImage))
 	battleArea.Hide()
 
-	// UPDATE SCORES FUNCTION - Updated for canvas.Text
+	// Update scores function
 	updateScores := func() {
 		cpuCardCount.Text = fmt.Sprintf("%d", len(cpu.Cards))
 		cpuCardCount.Refresh()
@@ -147,7 +147,7 @@ func main() {
 	}
 
 	// Add visual hint - Using canvas.Text for larger size
-	hintText := canvas.NewText("👆 Click your deck to play!", color.White)
+	hintText := canvas.NewText("👇 Click your deck to play!", color.White)
 	hintText.Alignment = fyne.TextAlignCenter
 	hintText.TextStyle.Bold = true
 	hintText.TextSize = 18
@@ -168,7 +168,7 @@ func main() {
 	warsThisGame := 0
 	longestWar := 0
 
-	// PLAY ROUND LOGIC
+	// Play round logic
 	executeRound := func() {
 		playerCard, cpuCard, result, gameOver, winner := ExecuteGameRound(player1, cpu)
 
@@ -193,14 +193,14 @@ func main() {
 		// Count the stats
 		if strings.Contains(result, "WAR!") {
 			warsThisGame++
-			// Make both texts exactly the same length for testing
-			leftStats.Text = fmt.Sprintf("Wars: %-3d", warsThisGame) // "Wars: 1  " (padded to 3 digits)
+			// Make both texts exactly the same length. Otherwise my whole UI changes and I can't figure this one out.
+			leftStats.Text = fmt.Sprintf("Wars: %-3d", warsThisGame)
 			leftStats.Refresh()
 
 			warSize := strings.Count(result, "WAR!") * 4
 			if warSize > longestWar {
 				longestWar = warSize
-				rightStats.Text = fmt.Sprintf("Long: %-3d", longestWar) // "Long: 0  " (same total length)
+				rightStats.Text = fmt.Sprintf("Long: %-3d", longestWar)
 				rightStats.Refresh()
 			}
 		}
@@ -211,7 +211,7 @@ func main() {
 		}
 	}
 
-	// START GAME BUTTON
+	// Start Game Button and function
 	var playButton *widget.Button
 	playButton = widget.NewButton("🎮 Start Game", func() {
 		gameTitle.Hide()
@@ -222,7 +222,7 @@ func main() {
 	})
 	playButton.Resize(fyne.NewSize(200, 50))
 
-	// CREATE CLICKABLE CARD (simplified - no count parameter)
+	// Create Clickable Card for the player
 	clickablePlayerCard := NewClickableCard(playerHandImage, func() {
 		if !gameTitle.Visible() && battleArea.Visible() {
 			executeRound()
