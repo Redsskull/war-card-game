@@ -10,290 +10,323 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 )
 
 func main() {
-	// Initialize the game
-	player1, cpu, setupMessages := StartGame()
-
 	myApp := app.New()
 	myWindow := myApp.NewWindow("War Card Game")
 	myWindow.Resize(fyne.NewSize(1920, 1080))
 
-	// setup messages
-	notificationText := canvas.NewText("", color.White)
-	notificationText.Alignment = fyne.TextAlignCenter
-	notificationText.TextStyle.Bold = true
-	notificationText.TextSize = 18
-	notificationText.Hide()
+	// Background for all screens
+	background := canvas.NewRectangle(color.RGBA{102, 51, 153, 255})
 
-	showNotification := func(message string) {
-		notificationText.Text = message
-		notificationText.Show()
-		notificationText.Refresh()
+	// === MAIN MENU SCREEN ===
+	menuTitle := canvas.NewText("⚔️ WAR CARD GAME ⚔️", color.White)
+	menuTitle.TextStyle.Bold = true
+	menuTitle.TextSize = 48
+	menuTitle.Alignment = fyne.TextAlignCenter
 
-		go func() {
-			time.Sleep(2 * time.Second)
-			fyne.Do(func() {
-				notificationText.Hide()
-			})
-		}()
-	}
+	menuSubtitle := canvas.NewText("Battle of the Cards", color.White)
+	menuSubtitle.TextStyle.Bold = true
+	menuSubtitle.TextSize = 24
+	menuSubtitle.Alignment = fyne.TextAlignCenter
 
-	// Carc count labels
-	cpuCardCount := canvas.NewText(fmt.Sprintf("%d", len(cpu.Cards)), color.White)
-	cpuCardCount.Alignment = fyne.TextAlignCenter
-	cpuCardCount.TextStyle.Bold = true
-	cpuCardCount.TextSize = 20
+	// Menu buttons
+	// I just could not avoid using var here
+	var gameContainer *fyne.Container
+	var showGameScreen func()
 
-	playerCardCount := canvas.NewText(fmt.Sprintf("%d", len(player1.Cards)), color.White)
-	playerCardCount.Alignment = fyne.TextAlignCenter
-	playerCardCount.TextStyle.Bold = true
-	playerCardCount.TextSize = 20
+	startButton := widget.NewButton("🎮 Start New Game", func() {
+		showGameScreen()
+	})
+	startButton.Resize(fyne.NewSize(300, 60))
 
-	// Played (hidden initially)
-	playerCardImage := canvas.NewImageFromFile("Cards/card_joker.png")
-	playerCardImage.SetMinSize(fyne.NewSize(250, 350))
-	playerCardImage.FillMode = canvas.ImageFillContain
-	playerCardImage.Hide()
+	rulesButton := widget.NewButton("📖 How to Play", func() {
+		rulesText := `WAR CARD GAME RULES:
 
-	cpuCardImage := canvas.NewImageFromFile("Cards/card_joker.png")
-	cpuCardImage.SetMinSize(fyne.NewSize(250, 350))
-	cpuCardImage.FillMode = canvas.ImageFillContain
-	cpuCardImage.Hide()
+🎯 OBJECTIVE: Win all the cards!
 
-	// Hand cards (hidden initially)
-	playerHandImage := canvas.NewImageFromFile("Cards/card_back_suits_blue.png")
-	playerHandImage.SetMinSize(fyne.NewSize(180, 300))
-	playerHandImage.FillMode = canvas.ImageFillContain
+🎮 HOW TO PLAY:
+• Click your deck to play a card
+• Higher card wins both cards
+• Ace beats King, King beats Queen, etc.
 
-	cpuHandImage := canvas.NewImageFromFile("Cards/card_back_suits_dark.png")
-	cpuHandImage.SetMinSize(fyne.NewSize(180, 300))
-	cpuHandImage.FillMode = canvas.ImageFillContain
+⚔️ WAR HAPPENS WHEN:
+• Both players play the same value
+• Each player puts down 3 cards face down
+• Then plays 1 card face up
+• Winner takes all cards in play!
 
-	// TITLE - Using canvas.Text for larger size
-	gameTitle := canvas.NewText("War Card Game", color.White)
-	gameTitle.TextStyle.Bold = true
-	gameTitle.TextSize = 22
-	gameTitle.Alignment = fyne.TextAlignCenter
+🃏 SPECIAL CARDS:
+• Normal Joker (15) - Very strong!
+• Red Joker (16) - Stronger!
+• Black Joker (17) - UNBEATABLE!
 
-	// GAME RESULT (hidden initially) - Using canvas.Text for larger size
-	gameResult := canvas.NewText("", color.White)
-	gameResult.Alignment = fyne.TextAlignCenter
-	gameResult.TextSize = 20
-	gameResult.TextStyle.Bold = true
-	gameResult.Hide()
+🏆 WIN CONDITION:
+• Game ends when opponent runs out of cards
+• Player with all cards wins!
 
-	// Initial display
-	initialDisplay := container.NewCenter(
-		container.NewVBox(
-			notificationText,
-			container.NewCenter(
-				func() *canvas.Text {
-					sword := canvas.NewText("⚔️", color.White)
-					sword.TextSize = 64
-					sword.TextStyle.Bold = true
-					sword.Alignment = fyne.TextAlignCenter
-					return sword
-				}()),
+Good luck, warrior! ⚔️`
 
-			container.NewCenter(
-				container.NewHBox(
-					func() *canvas.Text {
-						player := canvas.NewText("👤 PLAYER", color.White)
-						player.TextSize = 24
-						player.TextStyle.Bold = true
-						return player
-					}(),
-					func() *canvas.Text {
-						vs := canvas.NewText("🆚", color.White)
-						vs.TextSize = 48
-						vs.TextStyle.Bold = true
-						vs.Alignment = fyne.TextAlignCenter
-						return vs
-					}(),
-					func() *canvas.Text {
-						cpu := canvas.NewText("🤖 CPU", color.White)
-						cpu.TextSize = 24
-						cpu.TextStyle.Bold = true
-						return cpu
-					}(),
-				)),
+		dialog.ShowInformation("How to Play War", rulesText, myWindow)
+	})
+	rulesButton.Resize(fyne.NewSize(300, 60))
 
-			container.NewCenter(
-				func() *canvas.Text {
-					ready := canvas.NewText("Ready for Battle!", color.White)
-					ready.TextStyle.Bold = true
-					ready.TextSize = 20
-					ready.Alignment = fyne.TextAlignCenter
-					return ready
-				}())))
+	quitButton := widget.NewButton("❌ Quit Game", func() {
+		myApp.Quit()
+	})
+	quitButton.Resize(fyne.NewSize(300, 60))
 
-	// BATTLE AREA (hidden initially) - Using canvas.Text for larger VS
-	vsText := canvas.NewText("  VS  ", color.White)
-	vsText.TextSize = 28
-	vsText.TextStyle.Bold = true
-	battleArea := container.NewCenter(
-		container.NewHBox(playerCardImage, vsText, cpuCardImage))
-	battleArea.Hide()
+	menuButtons := container.NewVBox(
+		startButton,
+		widget.NewLabel(""), // Spacer
+		rulesButton,
+		widget.NewLabel(""), // Spacer
+		quitButton,
+	)
 
-	// Update scores function
-	updateScores := func() {
-		cpuCardCount.Text = fmt.Sprintf("%d", len(cpu.Cards))
-		cpuCardCount.Refresh()
-		playerCardCount.Text = fmt.Sprintf("%d", len(player1.Cards))
-		playerCardCount.Refresh()
-	}
+	menuScreen := container.NewVBox(
+		widget.NewLabel(""), // Top spacer
+		widget.NewLabel(""), // Top spacer
+		menuTitle,
+		widget.NewLabel(""), // Spacer
+		menuSubtitle,
+		widget.NewLabel(""), // Spacer
+		widget.NewLabel(""), // Spacer
+		container.NewCenter(menuButtons),
+	)
 
-	// Add visual hint - Using canvas.Text for larger size
-	hintText := canvas.NewText("👇 Click your deck to play!", color.White)
-	hintText.Alignment = fyne.TextAlignCenter
-	hintText.TextStyle.Bold = true
-	hintText.TextSize = 18
-	hintText.Hide()
+	// === GAME SCREEN (game logic) ===
+	createGameScreen := func() *fyne.Container {
+		// Initialize the game
+		player1, cpu, setupMessages := StartGame()
 
-	// Stats Display
-	leftStats := canvas.NewText("Wars: 0", color.White)
-	leftStats.Alignment = fyne.TextAlignLeading
-	leftStats.TextSize = 34
-	leftStats.TextStyle.Bold = true
+		// Notification system (your existing code)
+		notificationText := canvas.NewText("", color.White)
+		notificationText.Alignment = fyne.TextAlignCenter
+		notificationText.TextStyle.Bold = true
+		notificationText.TextSize = 18
+		notificationText.Hide()
 
-	rightStats := canvas.NewText("Long: 0", color.White)
-	rightStats.Alignment = fyne.TextAlignTrailing
-	rightStats.TextSize = 34
-	rightStats.TextStyle.Bold = true
+		showNotification := func(message string) {
+			notificationText.Text = message
+			notificationText.Show()
+			notificationText.Refresh()
 
-	// Keep track of stats
-	warsThisGame := 0
-	longestWar := 0
-
-	// Play round logic
-	executeRound := func() {
-		playerCard, cpuCard, result, gameOver, winner := ExecuteGameRound(player1, cpu)
-
-		if gameOver && winner == "" {
-			return // No cards to play
+			go func() {
+				time.Sleep(2 * time.Second)
+				fyne.Do(func() {
+					notificationText.Hide()
+				})
+			}()
 		}
 
-		// UI updates
-		playerCardImage.File = playerCard.GetImageFilename()
-		playerCardImage.Show()
-		playerCardImage.Refresh()
+		// Card count labels
+		cpuCardCount := canvas.NewText(fmt.Sprintf("%d", len(cpu.Cards)), color.White)
+		cpuCardCount.Alignment = fyne.TextAlignCenter
+		cpuCardCount.TextStyle.Bold = true
+		cpuCardCount.TextSize = 20
 
-		cpuCardImage.File = cpuCard.GetImageFilename()
-		cpuCardImage.Show()
-		cpuCardImage.Refresh()
+		playerCardCount := canvas.NewText(fmt.Sprintf("%d", len(player1.Cards)), color.White)
+		playerCardCount.Alignment = fyne.TextAlignCenter
+		playerCardCount.TextStyle.Bold = true
+		playerCardCount.TextSize = 20
 
-		gameResult.Text = result
-		gameResult.Show()
-		gameResult.Refresh()
-		updateScores()
+		// Card images
+		playerCardImage := canvas.NewImageFromFile("Cards/card_joker.png")
+		playerCardImage.SetMinSize(fyne.NewSize(250, 350))
+		playerCardImage.FillMode = canvas.ImageFillContain
+		playerCardImage.Hide()
 
-		// Count the stats
-		if strings.Contains(result, "WAR!") {
-			warsThisGame++
-			// Make both texts exactly the same length. Otherwise my whole UI changes and I can't figure this one out.
-			leftStats.Text = fmt.Sprintf("Wars: %-3d", warsThisGame)
-			leftStats.Refresh()
+		cpuCardImage := canvas.NewImageFromFile("Cards/card_joker.png")
+		cpuCardImage.SetMinSize(fyne.NewSize(250, 350))
+		cpuCardImage.FillMode = canvas.ImageFillContain
+		cpuCardImage.Hide()
 
-			warSize := strings.Count(result, "WAR!") * 4
-			if warSize > longestWar {
-				longestWar = warSize
-				rightStats.Text = fmt.Sprintf("Long: %-3d", longestWar)
-				rightStats.Refresh()
+		playerHandImage := canvas.NewImageFromFile("Cards/card_back_suits_blue.png")
+		playerHandImage.SetMinSize(fyne.NewSize(180, 300))
+		playerHandImage.FillMode = canvas.ImageFillContain
+
+		cpuHandImage := canvas.NewImageFromFile("Cards/card_back_suits_dark.png")
+		cpuHandImage.SetMinSize(fyne.NewSize(180, 300))
+		cpuHandImage.FillMode = canvas.ImageFillContain
+
+		// Game result text
+		gameResult := canvas.NewText("", color.White)
+		gameResult.Alignment = fyne.TextAlignCenter
+		gameResult.TextSize = 20
+		gameResult.TextStyle.Bold = true
+		gameResult.Hide()
+
+		// Battle area
+		vsText := canvas.NewText("  VS  ", color.White)
+		vsText.TextSize = 28
+		vsText.TextStyle.Bold = true
+		battleArea := container.NewCenter(
+			container.NewHBox(playerCardImage, vsText, cpuCardImage))
+
+		// Hint text
+		hintText := canvas.NewText("👇 Click your deck to play!", color.White)
+		hintText.Alignment = fyne.TextAlignCenter
+		hintText.TextStyle.Bold = true
+		hintText.TextSize = 18
+
+		// Stats (your existing code)
+		leftStats := canvas.NewText("Wars: 0", color.White)
+		leftStats.Alignment = fyne.TextAlignLeading
+		leftStats.TextSize = 34
+		leftStats.TextStyle.Bold = true
+
+		rightStats := canvas.NewText("Long: 0", color.White)
+		rightStats.Alignment = fyne.TextAlignTrailing
+		rightStats.TextSize = 34
+		rightStats.TextStyle.Bold = true
+
+		warsThisGame := 0
+		longestWar := 0
+
+		// Update scores function
+		updateScores := func() {
+			cpuCardCount.Text = fmt.Sprintf("%d", len(cpu.Cards))
+			cpuCardCount.Refresh()
+			playerCardCount.Text = fmt.Sprintf("%d", len(player1.Cards))
+			playerCardCount.Refresh()
+		}
+
+		// Return to menu button
+		returnToMenuButton := widget.NewButton("🏠 Main Menu", func() {
+			// Hide game screen, show menu screen
+			gameContainer.Hide()
+			menuScreen.Show()
+		})
+		returnToMenuButton.Hide() // Hidden until game ends
+
+		// Play round logic
+		executeRound := func() {
+			playerCard, cpuCard, result, gameOver, winner := ExecuteGameRound(player1, cpu)
+
+			if gameOver && winner == "" {
+				return
+			}
+
+			playerCardImage.File = playerCard.GetImageFilename()
+			playerCardImage.Show()
+			playerCardImage.Refresh()
+
+			cpuCardImage.File = cpuCard.GetImageFilename()
+			cpuCardImage.Show()
+			cpuCardImage.Refresh()
+
+			gameResult.Text = result
+			gameResult.Show()
+			gameResult.Refresh()
+			updateScores()
+
+			// Stats tracking
+			if strings.Contains(result, "WAR!") {
+				warsThisGame++
+				leftStats.Text = fmt.Sprintf("Wars: %-3d", warsThisGame)
+				leftStats.Refresh()
+
+				warSize := strings.Count(result, "WAR!") * 4
+				if warSize > longestWar {
+					longestWar = warSize
+					rightStats.Text = fmt.Sprintf("Long: %-3d", longestWar)
+					rightStats.Refresh()
+				}
+			}
+
+			if gameOver {
+				gameResult.Text = winner
+				hintText.Hide()
+				returnToMenuButton.Show()
 			}
 		}
 
-		if gameOver {
-			gameResult.Text = winner
-			hintText.Hide()
-		}
+		// Clickable player card
+		clickablePlayerCard := NewClickableCard(playerHandImage, func() {
+			if battleArea.Visible() {
+				executeRound()
+			}
+		})
+
+		// Layout
+		topArea := container.NewVBox(
+			container.NewStack(cpuHandImage, cpuCardCount),
+		)
+
+		middleContent := container.NewVBox(
+			battleArea,
+			gameResult,
+			returnToMenuButton,
+		)
+
+		middleArea := container.NewBorder(
+			nil, nil,
+			leftStats,
+			rightStats,
+			container.NewCenter(middleContent))
+
+		bottomArea := container.NewVBox(
+			hintText,
+			container.NewStack(clickablePlayerCard, playerCardCount),
+		)
+
+		gameContent := container.NewBorder(topArea, bottomArea, nil, nil, middleArea)
+
+		// notification overlay
+		gameWithNotification := container.NewStack(gameContent, notificationText)
+
+		// Start notification messages
+		go func() {
+			time.Sleep(1 * time.Second)
+			for _, msg := range setupMessages {
+				message := msg
+				fyne.Do(func() {
+					showNotification(message)
+				})
+				time.Sleep(3 * time.Second)
+			}
+		}()
+
+		// Position card counts
+		go func() {
+			time.Sleep(100 * time.Millisecond)
+			fyne.Do(func() {
+				cpuCardCount.Move(fyne.NewPos(1, -5))
+				playerCardCount.Move(fyne.NewPos(1, -10))
+				cpuCardCount.Refresh()
+				playerCardCount.Refresh()
+			})
+		}()
+
+		return gameWithNotification
 	}
 
-	// Start Game Button and function
-	var playButton *widget.Button
-	playButton = widget.NewButton("🎮 Start Game", func() {
-		gameTitle.Hide()
-		playButton.Hide()
-		initialDisplay.Hide()
-		battleArea.Show()
-		hintText.Show()
-	})
-	playButton.Resize(fyne.NewSize(200, 50))
+	// Create the game container
+	gameContainer = createGameScreen()
+	gameContainer.Hide() // Start hidden
 
-	// Create Clickable Card for the player
-	clickablePlayerCard := NewClickableCard(playerHandImage, func() {
-		if !gameTitle.Visible() && battleArea.Visible() {
-			executeRound()
-		}
-	})
+	// Navigation function
+	showGameScreen = func() {
+		menuScreen.Hide()
+		gameContainer.Show()
+	}
 
-	// LAYOUT
-
-	// TOP
-	topArea := container.NewVBox(
-		container.NewCenter(gameTitle),
-		container.NewStack(cpuHandImage, cpuCardCount),
+	// Main container with both screens
+	mainContainer := container.NewStack(
+		container.NewCenter(menuScreen),
+		gameContainer,
 	)
 
-	// MIDDLE
-	// Store the current middle content
-	currentMiddleContent := container.NewVBox(
-		container.NewStack(initialDisplay, battleArea),
-		playButton,
-		gameResult,
-	)
+	// Final window content
+	finalContent := container.NewStack(background, mainContainer)
+	myWindow.SetContent(finalContent)
 
-	// NEW middleArea with stats on sides:
-	middleArea := container.NewBorder(
-		nil, nil, // no top/bottom
-		leftStats,  // left side
-		rightStats, // right side
-		container.NewCenter(currentMiddleContent)) // center content
-
-	// BOTTOM
-	bottomArea := container.NewVBox(
-		hintText,
-		container.NewStack(clickablePlayerCard, playerCardCount),
-	)
-
-	content := container.NewBorder(topArea, bottomArea, nil, nil, middleArea)
-
-	// FINAL DISPLAY with beautiful purple background
-	background := canvas.NewRectangle(color.RGBA{102, 51, 153, 255})
-	contentWithBackground := container.NewStack(background, content)
-	myWindow.SetContent(contentWithBackground)
-
-	// Start the notification display after window is ready
-	go func() {
-		time.Sleep(1 * time.Second)
-
-		for _, msg := range setupMessages {
-			message := msg
-			fyne.Do(func() {
-				showNotification(message)
-			})
-			time.Sleep(3 * time.Second)
-		}
-	}()
-
-	// I tried in so many different ways to make the score appear exactly where I want it to. Go func(goroutine)
-	// is the only way that worked for me
-	go func() {
-		time.Sleep(100 * time.Millisecond)
-		fyne.Do(func() {
-			cpuCardCount.Move(fyne.NewPos(1, -5))
-			playerCardCount.Move(fyne.NewPos(1, -10))
-			cpuCardCount.Refresh()
-			playerCardCount.Refresh()
-		})
-	}()
-
-	// track fullscreen state
+	// Fullscreen toggle
 	isFull := false
-
-	// Listen for key events on the window's canvas
 	myWindow.Canvas().SetOnTypedKey(func(ev *fyne.KeyEvent) {
 		if ev.Name == fyne.KeyF11 {
 			isFull = !isFull

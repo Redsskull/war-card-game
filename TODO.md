@@ -86,13 +86,12 @@
 
 
 ### 3. Add Simple Menu System (3-4 hours) 🎮
-- [ ] Create main menu with:
+- [x ] Create main menu with:
   - Start New Game button
   - How to Play button (shows rules)
   - Quit button
-- [ ] Add "New Game" button after game ends
-- [ ] Add "Return to Menu" option
-
+- [x ] Add "New Game" button after game ends
+- [ x]
 ### 4. Add Speed Mode (4-5 hours) ⚡
 - [ ] Add "Auto-Play" toggle button
 - [ ] When enabled, automatically play a round every 1.5 seconds
