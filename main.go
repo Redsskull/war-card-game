@@ -172,6 +172,7 @@ Good luck, warrior! ⚔️`
 
 		warsThisGame := 0
 		longestWar := 0
+		gameAcceptingClicks := true // Track if game accepts card clicks
 
 		// Update scores function
 		updateScores := func() {
@@ -199,6 +200,7 @@ Good luck, warrior! ⚔️`
 
 			// Check if this is a war - show tied cards first!
 			if warInfo.IsWar {
+				gameAcceptingClicks = false // Disable clicks during war
 				// STEP 1: Show the TIED CARDS that caused the war (2 seconds)
 				playerCardImage.File = warInfo.TiedCard1.GetImageFilename()
 				playerCardImage.Show()
@@ -237,6 +239,8 @@ Good luck, warrior! ⚔️`
 
 							gameResult.Text = result
 							gameResult.Refresh()
+							gameAcceptingClicks = true // Re-enable clicks after war
+							updateScores()             // Update card counts after war visuals complete
 						})
 					})
 				})
@@ -253,9 +257,8 @@ Good luck, warrior! ⚔️`
 				gameResult.Text = result
 				gameResult.Show()
 				gameResult.Refresh()
+				updateScores() // Update immediately for normal rounds
 			}
-
-			updateScores()
 
 			// Stats tracking
 			if strings.Contains(result, "WAR!") {
@@ -280,7 +283,7 @@ Good luck, warrior! ⚔️`
 
 		// Clickable player card
 		clickablePlayerCard := NewClickableCard(playerHandImage, func() {
-			if battleArea.Visible() {
+			if battleArea.Visible() && gameAcceptingClicks {
 				executeRound()
 			}
 		})
@@ -323,7 +326,7 @@ Good luck, warrior! ⚔️`
 		return gameContent
 	}
 
-	// Create the game container
+	// Create the initial game container
 	gameContainer = createGameScreen()
 	gameContainer.Hide() // Start hidden
 
@@ -342,6 +345,21 @@ Good luck, warrior! ⚔️`
 	// Final window content
 	finalContent := container.NewStack(background, mainContainer)
 	myWindow.SetContent(finalContent)
+
+	// Update Start New Game button with proper reset logic (after mainContainer is defined)
+	startButton.OnTapped = func() {
+		// Hide old game container
+		gameContainer.Hide()
+
+		// Create completely fresh game container
+		gameContainer = createGameScreen()
+
+		// Update the main container with the new game container
+		mainContainer.Objects[1] = gameContainer
+
+		// Show the new game
+		showGameScreen()
+	}
 
 	// Fullscreen toggle
 	isFull := false
