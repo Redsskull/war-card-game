@@ -191,23 +191,70 @@ Good luck, warrior! ⚔️`
 
 		// Play round logic
 		executeRound := func() {
-			playerCard, cpuCard, result, gameOver, winner := ExecuteGameRound(player1, cpu)
+			playerCard, cpuCard, result, gameOver, winner, warInfo := ExecuteGameRound(player1, cpu)
 
 			if gameOver && winner == "" {
 				return
 			}
 
-			playerCardImage.File = playerCard.GetImageFilename()
-			playerCardImage.Show()
-			playerCardImage.Refresh()
+			// Check if this is a war - show tied cards first!
+			if warInfo.IsWar {
+				// STEP 1: Show the TIED CARDS that caused the war (2 seconds)
+				playerCardImage.File = warInfo.TiedCard1.GetImageFilename()
+				playerCardImage.Show()
+				playerCardImage.Refresh()
 
-			cpuCardImage.File = cpuCard.GetImageFilename()
-			cpuCardImage.Show()
-			cpuCardImage.Refresh()
+				cpuCardImage.File = warInfo.TiedCard2.GetImageFilename()
+				cpuCardImage.Show()
+				cpuCardImage.Refresh()
 
-			gameResult.Text = result
-			gameResult.Show()
-			gameResult.Refresh()
+				// Show war message with tied card info
+				gameResult.Text = fmt.Sprintf("⚔️ WAR! Both played %s! Each player puts down 4 cards! ⚔️",
+					warInfo.TiedCard1.GetDisplayValue())
+				gameResult.Show()
+				gameResult.Refresh()
+
+				// STEP 2: After 5 seconds, replace with card backs (3 seconds)
+				time.AfterFunc(5*time.Second, func() {
+					fyne.Do(func() {
+						// Replace tied cards with card backs
+						playerCardImage.File = "Cards/card_back_suits_blue.png"
+						cpuCardImage.File = "Cards/card_back_suits_dark.png"
+						playerCardImage.Refresh()
+						cpuCardImage.Refresh()
+
+						gameResult.Text = "⚔️ WAR IN PROGRESS... ⚔️"
+						gameResult.Refresh()
+					})
+
+					// STEP 3: After 3 more seconds, show final winning cards
+					time.AfterFunc(3*time.Second, func() {
+						fyne.Do(func() {
+							playerCardImage.File = playerCard.GetImageFilename()
+							cpuCardImage.File = cpuCard.GetImageFilename()
+							playerCardImage.Refresh()
+							cpuCardImage.Refresh()
+
+							gameResult.Text = result
+							gameResult.Refresh()
+						})
+					})
+				})
+			} else {
+				// Normal round - no war
+				playerCardImage.File = playerCard.GetImageFilename()
+				playerCardImage.Show()
+				playerCardImage.Refresh()
+
+				cpuCardImage.File = cpuCard.GetImageFilename()
+				cpuCardImage.Show()
+				cpuCardImage.Refresh()
+
+				gameResult.Text = result
+				gameResult.Show()
+				gameResult.Refresh()
+			}
+
 			updateScores()
 
 			// Stats tracking

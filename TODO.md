@@ -7,8 +7,10 @@
 - ✅ **Cards display actual images when played**
 - ✅ **Responsive image sizing system**
 - ✅ **CLICKABLE CARDS WITH HOVER EFFECTS** ⭐ NEW!
-- ⚠️ **NEEDS WORK**: UI too small on large screens
-- ⚠️ **NEEDS WORK**: Player cards have red backs (should be blue)
+
+## Must Fix
+- Return to main menu and start new game does not rest the game and actually start a new game!
+
 
 
 ## MAJOR UPGRADE PLAN 🎯
@@ -100,11 +102,7 @@
 - [x] Add "New Game" button after game ends
 - [x] Enhanced How to Play with complete card hierarchy and game info
 ### 4. Add Speed Mode (4-5 hours) ⚡
-- [ ] Add "Auto-Play" toggle button
-- [ ] When enabled, automatically play a round every 1.5 seconds
-- [ ] Use goroutine with ticker (you already know goroutines!)
-- [ ] Add pause/resume functionality
-- [ ] Show "SPEED MODE" indicator when active
+- i decided not to do this. I don't want the game to play itself.
 
 ### 5. Improve War Display (3-4 hours) 🎴
 - [ ] Show all cards involved in a war (face down)

@@ -5,6 +5,15 @@ import (
 	"math/rand"
 )
 
+// War info struct
+type WarInfo struct {
+	IsWar        bool
+	CardsAtStake int
+	WarCount     int
+	TiedCard1    Card // The first card that caused the war
+	TiedCard2    Card // The second card that caused the war
+}
+
 func StartGame() (*Player, *Player) {
 	// 1. Create two players
 	player1 := Player{Name: "Player 1", Cards: []Card{}}
@@ -40,13 +49,16 @@ func StartGame() (*Player, *Player) {
 	return &player1, &cpu
 }
 
-func PlayRound(player1 *Player, cpu *Player) (Card, Card, string) {
+func PlayRound(player1 *Player, cpu *Player) (Card, Card, string, WarInfo) {
 	// Check if either player can't war, this is a game over condition
 	if !player1.HasCards() || !cpu.HasCards() {
-		return Card{}, Card{}, "Game over - someone ran out of cards"
+		emptyWarInfo := WarInfo{IsWar: false, CardsAtStake: 0, WarCount: 0, TiedCard1: Card{}, TiedCard2: Card{}}
+		return Card{}, Card{}, "Game over - someone ran out of cards", emptyWarInfo
+
 	}
 
 	allCards := []Card{} // All cards that will go to the winner
+	warCount := 0        // Track number of wars
 
 	// Initial cards
 	card1 := player1.PlayCard()
@@ -62,6 +74,7 @@ func PlayRound(player1 *Player, cpu *Player) (Card, Card, string) {
 	// Handle wars (only if there's a tie)
 	for card1.Value == card2.Value {
 		result += " -> WAR!"
+		warCount++ // Count this war
 
 		// Each player puts down cards for war
 		warCards1, lastCard1 := putDownWarCards(player1)
@@ -90,7 +103,21 @@ func PlayRound(player1 *Player, cpu *Player) (Card, Card, string) {
 		result += " -> CPU wins!"
 	}
 
-	return finalCard1, finalCard2, result
+	// Create war info
+	warInfo := WarInfo{
+		IsWar:        warCount > 0,
+		CardsAtStake: len(allCards),
+		WarCount:     warCount,
+	}
+
+	// If it's a war, store the tied cards (first two cards played)
+	if warCount > 0 && len(allCards) >= 2 {
+		warInfo.TiedCard1 = allCards[0] // Player's first card (the tie)
+		warInfo.TiedCard2 = allCards[1] // CPU's first card (the tie)
+	}
+
+	return finalCard1, finalCard2, result, warInfo
+
 }
 
 // Helper function to handle war card placement
@@ -121,18 +148,23 @@ func IsGameOver(player1, cpu *Player) (bool, string) {
 
 // ExecuteGameRound plays one complete round and returns the cards played,
 // result message, and whether the game is over with winner info.
-func ExecuteGameRound(player1, cpu *Player) (Card, Card, string, bool, string) {
+func ExecuteGameRound(player1, cpu *Player) (Card, Card, string, bool, string, WarInfo) {
+
 	// Check if game can continue
 	if !player1.HasCards() || !cpu.HasCards() {
 		gameOver, winner := IsGameOver(player1, cpu)
-		return Card{}, Card{}, "", gameOver, winner
+		emptyWarInfo := WarInfo{IsWar: false, CardsAtStake: 0, WarCount: 0, TiedCard1: Card{}, TiedCard2: Card{}}
+
+		return Card{}, Card{}, "", gameOver, winner, emptyWarInfo
+
 	}
 
 	// Play the round
-	playerCard, cpuCard, result := PlayRound(player1, cpu)
+	playerCard, cpuCard, result, warInfo := PlayRound(player1, cpu)
 
 	// Check if game is now over
 	gameOver, winner := IsGameOver(player1, cpu)
 
-	return playerCard, cpuCard, result, gameOver, winner
+	return playerCard, cpuCard, result, gameOver, winner, warInfo
+
 }
