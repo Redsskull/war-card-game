@@ -5,20 +5,16 @@ import (
 	"math/rand"
 )
 
-func StartGame() (*Player, *Player, []string) {
-	messages := []string{}
-
+func StartGame() (*Player, *Player) {
 	// 1. Create two players
 	player1 := Player{Name: "Player 1", Cards: []Card{}}
 	cpu := Player{Name: "CPU", Cards: []Card{}}
 
 	// 2. Create a deck
 	deck := NewDeck()
-	messages = append(messages, fmt.Sprintf("Deck created with %d cards", len(deck.Cards)))
 
 	// 3. Shuffle the deck
 	deck.Shuffle()
-	messages = append(messages, "Deck shuffled!")
 
 	// 4. Deal cards evenly to both players, give leftover to random player
 	totalCards := len(deck.Cards)
@@ -36,14 +32,12 @@ func StartGame() (*Player, *Player, []string) {
 		cardIndex := cardsPerPlayer*2 + i // Index 54 for the leftover card
 		if rand.Intn(2) == 0 {            // Random 0 or 1
 			player1.AddCard(deck.Cards[cardIndex])
-			messages = append(messages, "Player got the bonus card!")
 		} else {
 			cpu.AddCard(deck.Cards[cardIndex])
-			messages = append(messages, "CPU got the bonus card!")
 		}
 	}
 
-	return &player1, &cpu, messages
+	return &player1, &cpu
 }
 
 func PlayRound(player1 *Player, cpu *Player) (Card, Card, string) {

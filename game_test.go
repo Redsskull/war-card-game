@@ -6,7 +6,7 @@ import (
 )
 
 func TestStartGame(t *testing.T) {
-	player1, cpu, messages := StartGame()
+	player1, cpu := StartGame()
 
 	// Test that players are created
 	if player1 == nil || cpu == nil {
@@ -19,9 +19,9 @@ func TestStartGame(t *testing.T) {
 		t.Errorf("Expected 55 total cards, got %d", totalCards)
 	}
 
-	// Test that messages were created
-	if len(messages) == 0 {
-		t.Error("Should have setup messages")
+	// Test that cards are distributed (each player should have cards)
+	if len(player1.Cards) == 0 || len(cpu.Cards) == 0 {
+		t.Error("Both players should have cards")
 	}
 }
 

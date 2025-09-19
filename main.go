@@ -48,21 +48,27 @@ func main() {
 
 🎯 OBJECTIVE: Win all the cards!
 
-🎮 HOW TO PLAY:
-• Click your deck to play a card
-• Higher card wins both cards
-• Ace beats King, King beats Queen, etc.
-
-⚔️ WAR HAPPENS WHEN:
-• Both players play the same value
-• Each player puts down 3 cards face down
-• Then plays 1 card face up
-• Winner takes all cards in play!
-
-🃏 SPECIAL CARDS:
+🃏 CARD HIERARCHY (Lowest to Highest):
+• 2, 3, 4, 5, 6, 7, 8, 9, 10, Jack, Queen, King, Ace
 • Normal Joker (15) - Very strong!
 • Red Joker (16) - Stronger!
 • Black Joker (17) - UNBEATABLE!
+
+🎮 HOW TO PLAY:
+• Click your deck to play a card
+• Higher card wins both cards
+• Winner collects all played cards
+
+⚔️ WAR HAPPENS WHEN:
+• Both players play the same value
+• Each player puts down 4 cards (or all remaining)
+• The last card played determines the winner
+• Winner takes ALL cards from the war!
+
+🎲 GAME SETUP:
+• 55 cards total (52 regular + 3 Jokers)
+• Cards dealt evenly between players
+• One random player gets the extra card
 
 🏆 WIN CONDITION:
 • Game ends when opponent runs out of cards
@@ -101,27 +107,7 @@ Good luck, warrior! ⚔️`
 	// === GAME SCREEN (game logic) ===
 	createGameScreen := func() *fyne.Container {
 		// Initialize the game
-		player1, cpu, setupMessages := StartGame()
-
-		// Notification system (your existing code)
-		notificationText := canvas.NewText("", color.White)
-		notificationText.Alignment = fyne.TextAlignCenter
-		notificationText.TextStyle.Bold = true
-		notificationText.TextSize = 18
-		notificationText.Hide()
-
-		showNotification := func(message string) {
-			notificationText.Text = message
-			notificationText.Show()
-			notificationText.Refresh()
-
-			go func() {
-				time.Sleep(2 * time.Second)
-				fyne.Do(func() {
-					notificationText.Hide()
-				})
-			}()
-		}
+		player1, cpu := StartGame()
 
 		// Card count labels
 		cpuCardCount := canvas.NewText(fmt.Sprintf("%d", len(cpu.Cards)), color.White)
@@ -276,21 +262,6 @@ Good luck, warrior! ⚔️`
 
 		gameContent := container.NewBorder(topArea, bottomArea, nil, nil, middleArea)
 
-		// notification overlay
-		gameWithNotification := container.NewStack(gameContent, notificationText)
-
-		// Start notification messages
-		go func() {
-			time.Sleep(1 * time.Second)
-			for _, msg := range setupMessages {
-				message := msg
-				fyne.Do(func() {
-					showNotification(message)
-				})
-				time.Sleep(3 * time.Second)
-			}
-		}()
-
 		// Position card counts
 		go func() {
 			time.Sleep(100 * time.Millisecond)
@@ -302,7 +273,7 @@ Good luck, warrior! ⚔️`
 			})
 		}()
 
-		return gameWithNotification
+		return gameContent
 	}
 
 	// Create the game container
