@@ -135,11 +135,16 @@
 - [x] **Game state separation**: Clean distinction between game logic and UI state
 - [x] **Comprehensive testing**: Tests for reset functionality and click states
 
-### 6. Add Simple Animations (4-5 hours) 🎨
+### 6. Add Simple Animations (4-5 hours) 🎨 ✅ PARTIALLY COMPLETE
+- [x] **WAR SHAKE EFFECT**: Battle area shakes dramatically during wars! 🎨
+  - Realistic shake using dual sine waves (fast + slow oscillation)
+  - Natural decay effect that fades out over 1.5 seconds
+  - Perfectly targets just the card battle zone (not whole screen)
+  - Uses `fyne.NewAnimation()` with `AnimationEaseOut` curve
+  - Enhanced war experience with focused visual impact
 - [ ] Card slide animation when playing (move from deck to center)
 - [ ] Cards slide to winner's pile after round
 - [ ] Simple bounce effect when winning a war
-- [ ] Use Fyne's animation API (keep it simple!)
 
 ---
 
@@ -167,7 +172,7 @@
 
 ---
 
-## 📝 FINAL RESULT ✅ SHIPPED!
+## 📝 FINAL RESULT 
 
 ### 10. Final Polish & Documentation ✅
 - [ ] Update README.md with:
@@ -182,6 +187,7 @@
 
 **A fully functional War card game with:**
 - ⚔️ **Dramatic war sequences** with 3-phase visual progression
+- 🎨 **Battle shake animations** with realistic dual-wave motion effects
 - 🎴 **Beautiful card graphics** with real card images and hover effects  
 - 🎯 **Intuitive click-to-play** interaction with proper state management
 - 🏠 **Complete menu system** with proper game reset functionality
@@ -191,7 +197,8 @@
 
 **This project demonstrates mastery of:**
 - 🚀 **Advanced Go programming** with proper architecture
-- 🎨 **Fyne GUI framework** including custom widgets and containers
+- 🎨 **Fyne GUI framework** including custom widgets, containers, and animations
+- 📐 **Mathematical animation programming** with sine wave calculations
 - ⚡ **Concurrent programming** with goroutines and timing
 - 🔄 **State management** and UI synchronization  
 - 🏗️ **Clean code principles** with separation of concerns

@@ -166,10 +166,7 @@ func TestGameReset(t *testing.T) {
 
 	// Verify cards are freshly shuffled (different order likely)
 	differentOrder := false
-	minCards := len(resetPlayer1.Cards)
-	if len(player1.Cards) < minCards {
-		minCards = len(player1.Cards)
-	}
+	minCards := min(len(resetPlayer1.Cards), len(player1.Cards))
 
 	for i := 0; i < minCards && i < 3; i++ { // Check first 3 cards
 		if resetPlayer1.Cards[i].Value != player1.Cards[i].Value {
@@ -241,7 +238,7 @@ func TestWarScoreUpdateTiming(t *testing.T) {
 
 func TestGameClickState(t *testing.T) {
 	// This test simulates the game state logic for click handling during wars
-	// Since we can't easily test UI interactions, we test the underlying logic
+	// Since I can't easily test UI interactions, I test the underlying logic here
 
 	gameAcceptingClicks := true
 

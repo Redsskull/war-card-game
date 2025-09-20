@@ -159,7 +159,7 @@ Good luck, warrior! ⚔️`
 		hintText.TextStyle.Bold = true
 		hintText.TextSize = 18
 
-		// Stats (your existing code)
+		// Stats
 		leftStats := canvas.NewText("Wars: 0", color.White)
 		leftStats.Alignment = fyne.TextAlignLeading
 		leftStats.TextSize = 34
@@ -200,8 +200,9 @@ Good luck, warrior! ⚔️`
 
 			// Check if this is a war - show tied cards first!
 			if warInfo.IsWar {
-				gameAcceptingClicks = false // Disable clicks during war
-				// STEP 1: Show the TIED CARDS that caused the war (2 seconds)
+				gameAcceptingClicks = false                   // Disable clicks during war
+				ShakeContainer(battleArea, 25*time.Second/10) // Shake animation for war
+				// Show the tied cars that caused the war (2 seconds)
 				playerCardImage.File = warInfo.TiedCard1.GetImageFilename()
 				playerCardImage.Show()
 				playerCardImage.Refresh()
@@ -216,7 +217,7 @@ Good luck, warrior! ⚔️`
 				gameResult.Show()
 				gameResult.Refresh()
 
-				// STEP 2: After 5 seconds, replace with card backs (3 seconds)
+				// After 5 seconds, replace with card backs (3 seconds)
 				time.AfterFunc(5*time.Second, func() {
 					fyne.Do(func() {
 						// Replace tied cards with card backs
@@ -229,7 +230,7 @@ Good luck, warrior! ⚔️`
 						gameResult.Refresh()
 					})
 
-					// STEP 3: After 3 more seconds, show final winning cards
+					// After 3 more seconds, show final winning cards
 					time.AfterFunc(3*time.Second, func() {
 						fyne.Do(func() {
 							playerCardImage.File = playerCard.GetImageFilename()
@@ -240,7 +241,7 @@ Good luck, warrior! ⚔️`
 							gameResult.Text = result
 							gameResult.Refresh()
 							gameAcceptingClicks = true // Re-enable clicks after war
-							updateScores()             // Update card counts after war visuals complete
+							updateScores()
 						})
 					})
 				})
@@ -257,7 +258,7 @@ Good luck, warrior! ⚔️`
 				gameResult.Text = result
 				gameResult.Show()
 				gameResult.Refresh()
-				updateScores() // Update immediately for normal rounds
+				updateScores()
 			}
 
 			// Stats tracking
@@ -346,7 +347,7 @@ Good luck, warrior! ⚔️`
 	finalContent := container.NewStack(background, mainContainer)
 	myWindow.SetContent(finalContent)
 
-	// Update Start New Game button with proper reset logic (after mainContainer is defined)
+	// Update Start New Game button with proper reset logic
 	startButton.OnTapped = func() {
 		// Hide old game container
 		gameContainer.Hide()
