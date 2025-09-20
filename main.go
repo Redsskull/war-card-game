@@ -140,10 +140,7 @@ Good luck, warrior! ⚔️`
 		cpuHandImage.FillMode = canvas.ImageFillContain
 
 		// Game result text
-		gameResult := canvas.NewText("", color.White)
-		gameResult.Alignment = fyne.TextAlignCenter
-		gameResult.TextSize = 20
-		gameResult.TextStyle.Bold = true
+		gameResult := newLargeMultilineText("")
 		gameResult.Hide()
 
 		// Battle area
@@ -212,7 +209,7 @@ Good luck, warrior! ⚔️`
 				cpuCardImage.Refresh()
 
 				// Show war message with tied card info
-				gameResult.Text = fmt.Sprintf("⚔️ WAR! Both played %s! Each player puts down 4 cards! ⚔️",
+				gameResult.Segments[0].(*widget.TextSegment).Text = fmt.Sprintf("⚔️ WAR! Both played %s! Each player puts down 4 cards! ⚔️",
 					warInfo.TiedCard1.GetDisplayValue())
 				gameResult.Show()
 				gameResult.Refresh()
@@ -226,7 +223,7 @@ Good luck, warrior! ⚔️`
 						playerCardImage.Refresh()
 						cpuCardImage.Refresh()
 
-						gameResult.Text = "⚔️ WAR IN PROGRESS... ⚔️"
+						gameResult.Segments[0].(*widget.TextSegment).Text = "⚔️ WAR IN PROGRESS... ⚔️"
 						gameResult.Refresh()
 					})
 
@@ -238,7 +235,7 @@ Good luck, warrior! ⚔️`
 							playerCardImage.Refresh()
 							cpuCardImage.Refresh()
 
-							gameResult.Text = result
+							gameResult.Segments[0].(*widget.TextSegment).Text = breakLongText(result, 60)
 							gameResult.Refresh()
 							gameAcceptingClicks = true // Re-enable clicks after war
 							updateScores()
@@ -255,7 +252,7 @@ Good luck, warrior! ⚔️`
 				cpuCardImage.Show()
 				cpuCardImage.Refresh()
 
-				gameResult.Text = result
+				gameResult.Segments[0].(*widget.TextSegment).Text = breakLongText(result, 60)
 				gameResult.Show()
 				gameResult.Refresh()
 				updateScores()
@@ -276,7 +273,7 @@ Good luck, warrior! ⚔️`
 			}
 
 			if gameOver {
-				gameResult.Text = winner
+				gameResult.Segments[0].(*widget.TextSegment).Text = breakLongText(winner, 60)
 				hintText.Hide()
 				returnToMenuButton.Show()
 			}

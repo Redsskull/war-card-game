@@ -2,10 +2,12 @@ package main
 
 import (
 	"math"
+	"strings"
 	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -83,4 +85,53 @@ func ShakeContainer(container *fyne.Container, duration time.Duration) {
 			container.Move(originalPos)
 		})
 	})
+}
+
+// breakLongText breaks long text into multiple lines at natural break points
+// I decided to do this since I may lack the knowledge or Fyne can't keep my UI elements to the right if the
+// text get's too long for the result, and I can't use canvas for a new line
+func breakLongText(text string, maxLineLength int) string {
+	if len(text) <= maxLineLength {
+		return text
+	}
+
+	// Split by " -> " first to find natural break points
+	parts := strings.Split(text, " -> ")
+	if len(parts) == 1 {
+		// No natural break points, just return original
+		return text
+	}
+
+	result := parts[0]
+	currentLineLength := len(parts[0])
+
+	for i := 1; i < len(parts); i++ {
+		nextPart := " -> " + parts[i]
+
+		// If adding this part would exceed the line length, start a new line
+		if currentLineLength+len(nextPart) > maxLineLength {
+			result += "\n" + nextPart[4:] // Remove " -> " from start of new line
+			currentLineLength = len(nextPart) - 4
+		} else {
+			result += nextPart
+			currentLineLength += len(nextPart)
+		}
+	}
+
+	return result
+}
+
+// newLargeMultilineText creates a RichText widget with larger text size that supports newlines
+func newLargeMultilineText(text string) *widget.RichText {
+	segment := &widget.TextSegment{
+		Text: text,
+		Style: widget.RichTextStyle{
+			Alignment: fyne.TextAlignCenter,
+			SizeName:  theme.SizeNameHeadingText, // This gives larger text like TextSize = 20. had to look up and learn themes for Fyne
+			TextStyle: fyne.TextStyle{Bold: true},
+		},
+	}
+
+	richText := widget.NewRichText(segment)
+	return richText
 }

@@ -106,9 +106,9 @@
 - [x] **DECIDED NOT TO IMPLEMENT** - Players want to play games, not watch them play themselves!
 
 ### 5. Improve War Display (3-4 hours) 🎴 ✅ COMPLETE!
-- [x] **DRAMATIC 3-PHASE WAR SEQUENCE**: 
+- [x] **DRAMATIC 3-PHASE WAR SEQUENCE**:
   - Phase 1 (5s): Show tied cards that caused the war
-  - Phase 2 (3s): Show card backs representing face-down war cards  
+  - Phase 2 (3s): Show card backs representing face-down war cards
   - Phase 3: Reveal final deciding cards and winner
 - [x] **Enhanced war messaging**: "Both played Queen! Each player puts down 4 cards!"
 - [x] **Proper timing**: Card counts update AFTER war visuals complete
@@ -123,7 +123,7 @@
   - Problem: Clicking main menu → start new game showed old game state
   - Solution: Proper container cleanup and fresh game creation
   - Method: `gameContainer.Objects = []fyne.CanvasObject{}` + rebuild
-  
+
 - [x] **Fixed card click disable during wars**
   - Problem: Players could spam-click during 8-second war sequence
   - Solution: `gameAcceptingClicks` state variable with proper timing
@@ -131,7 +131,7 @@
 
 ### Container & Memory Management
 - [x] **Proper UI cleanup**: Prevents memory leaks and visual conflicts
-- [x] **Container reference management**: Fixed mainContainer updates  
+- [x] **Container reference management**: Fixed mainContainer updates
 - [x] **Game state separation**: Clean distinction between game logic and UI state
 - [x] **Comprehensive testing**: Tests for reset functionality and click states
 
@@ -142,9 +142,7 @@
   - Perfectly targets just the card battle zone (not whole screen)
   - Uses `fyne.NewAnimation()` with `AnimationEaseOut` curve
   - Enhanced war experience with focused visual impact
-- [ ] Card slide animation when playing (move from deck to center)
-- [ ] Cards slide to winner's pile after round
-- [ ] Simple bounce effect when winning a war
+
 
 ---
 
@@ -172,7 +170,7 @@
 
 ---
 
-## 📝 FINAL RESULT 
+## 📝 FINAL RESULT
 
 ### 10. Final Polish & Documentation ✅
 - [ ] Update README.md with:
@@ -188,7 +186,7 @@
 **A fully functional War card game with:**
 - ⚔️ **Dramatic war sequences** with 3-phase visual progression
 - 🎨 **Battle shake animations** with realistic dual-wave motion effects
-- 🎴 **Beautiful card graphics** with real card images and hover effects  
+- 🎴 **Beautiful card graphics** with real card images and hover effects
 - 🎯 **Intuitive click-to-play** interaction with proper state management
 - 🏠 **Complete menu system** with proper game reset functionality
 - 🛡️ **Robust error handling** and memory management
@@ -200,7 +198,7 @@
 - 🎨 **Fyne GUI framework** including custom widgets, containers, and animations
 - 📐 **Mathematical animation programming** with sine wave calculations
 - ⚡ **Concurrent programming** with goroutines and timing
-- 🔄 **State management** and UI synchronization  
+- 🔄 **State management** and UI synchronization
 - 🏗️ **Clean code principles** with separation of concerns
 - 🧪 **Test-driven development** with comprehensive test suites
 - 🎮 **Game development concepts** adapted to GUI frameworks

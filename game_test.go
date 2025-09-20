@@ -286,3 +286,48 @@ func TestGameClickState(t *testing.T) {
 		}
 	}
 }
+
+func TestBreakLongText(t *testing.T) {
+	// Test 1: Short text should not be broken
+	shortText := "Player: King, CPU: 7 -> Player wins!"
+	result := breakLongText(shortText, 60)
+	if result != shortText {
+		t.Errorf("Short text should not be modified, got: %s", result)
+	}
+
+	// Test 2: Long war text should be broken at natural break points
+	longText := "Player: King, CPU: King -> WAR! -> Player: 5, CPU: 7 -> CPU wins!"
+	expected := "Player: King, CPU: King -> WAR! -> Player: 5, CPU: 7\nCPU wins!"
+	result = breakLongText(longText, 60)
+	if result != expected {
+		t.Errorf("Expected:\n%s\nGot:\n%s", expected, result)
+	}
+
+	// Test 3: Very long text with multiple wars
+	veryLongText := "Player: King, CPU: King -> WAR! -> Player: Ace, CPU: Ace -> WAR! -> Player: 3, CPU: 9 -> CPU wins!"
+	result = breakLongText(veryLongText, 60)
+	lines := strings.Split(result, "\n")
+	if len(lines) < 2 {
+		t.Error("Very long text should be broken into multiple lines")
+	}
+
+	// Verify each line is within reasonable length
+	for i, line := range lines {
+		if len(line) > 70 { // Allow some buffer over maxLineLength
+			t.Errorf("Line %d is too long (%d chars): %s", i+1, len(line), line)
+		}
+	}
+
+	// Test 4: Text without natural break points should not be broken
+	noBreakText := "This is a long sentence without any natural break points to split on"
+	result = breakLongText(noBreakText, 30)
+	if result != noBreakText {
+		t.Error("Text without break points should not be modified")
+	}
+
+	// Test 5: Empty string
+	result = breakLongText("", 60)
+	if result != "" {
+		t.Error("Empty string should remain empty")
+	}
+}
