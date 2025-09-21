@@ -154,7 +154,6 @@ func ExecuteGameRound(player1, cpu *Player) (Card, Card, string, bool, string, W
 	if !player1.HasCards() || !cpu.HasCards() {
 		gameOver, winner := IsGameOver(player1, cpu)
 		emptyWarInfo := WarInfo{IsWar: false, CardsAtStake: 0, WarCount: 0, TiedCard1: Card{}, TiedCard2: Card{}}
-
 		return Card{}, Card{}, "", gameOver, winner, emptyWarInfo
 
 	}

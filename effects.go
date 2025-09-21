@@ -30,6 +30,9 @@ func NewClickableCard(cardImage *canvas.Image, onTap func()) *ClickableCard {
 
 // Tapped handles the tap event
 func (c *ClickableCard) Tapped(*fyne.PointEvent) {
+	// Play the card click sound!
+	PlayCardClickSound()
+
 	if c.onTap != nil {
 		c.onTap()
 	}

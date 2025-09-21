@@ -11,6 +11,7 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -19,10 +20,17 @@ func main() {
 	myWindow := myApp.NewWindow("War Card Game")
 	myWindow.Resize(fyne.NewSize(1920, 1080))
 
+	//  Initialize sound system
+	err := InitializeSoundSystem()
+	if err != nil {
+		fmt.Printf("Warning: Sound system failed to initialize: %v\n", err)
+		fmt.Println("Game will run without sound effects.")
+	}
+
 	// Background for all screens
 	background := canvas.NewRectangle(color.RGBA{102, 51, 153, 255})
 
-	// === MAIN MENU SCREEN ===
+	// Main menu screen
 	menuTitle := canvas.NewText("⚔️ WAR CARD GAME ⚔️", color.White)
 	menuTitle.TextStyle.Bold = true
 	menuTitle.TextSize = 48
@@ -42,6 +50,20 @@ func main() {
 		showGameScreen()
 	})
 	startButton.Resize(fyne.NewSize(300, 60))
+
+	// Fullscreen toggle button - easy and user-friendly!
+	isFullscreen := false
+	var fullscreenButton *widget.Button
+	fullscreenButton = widget.NewButton("🖥️ Fullscreen Mode", func() {
+		isFullscreen = !isFullscreen
+		myWindow.SetFullScreen(isFullscreen)
+		if isFullscreen {
+			fullscreenButton.SetText("🪟 Windowed Mode")
+		} else {
+			fullscreenButton.SetText("🖥️ Fullscreen Mode")
+		}
+	})
+	fullscreenButton.Resize(fyne.NewSize(300, 60))
 
 	rulesButton := widget.NewButton("📖 How to Play", func() {
 		rulesText := `WAR CARD GAME RULES:
@@ -74,6 +96,11 @@ func main() {
 • Game ends when opponent runs out of cards
 • Player with all cards wins!
 
+⌨️ CONTROLS:
+• F11: Toggle fullscreen
+• Ctrl+Q: Quit game
+• Click fullscreen button in menu
+
 Good luck, warrior! ⚔️`
 
 		dialog.ShowInformation("How to Play War", rulesText, myWindow)
@@ -88,10 +115,17 @@ Good luck, warrior! ⚔️`
 	menuButtons := container.NewVBox(
 		startButton,
 		widget.NewLabel(""), // Spacer
+		fullscreenButton,    // Add our new fullscreen button
+		widget.NewLabel(""), // Spacer
 		rulesButton,
 		widget.NewLabel(""), // Spacer
 		quitButton,
 	)
+
+	// Shortcut hints
+	shortcutHints := canvas.NewText("💡 Tips: F11 = Fullscreen | Ctrl+Q = Quit", color.RGBA{200, 200, 200, 255})
+	shortcutHints.Alignment = fyne.TextAlignCenter
+	shortcutHints.TextSize = 14
 
 	menuScreen := container.NewVBox(
 		widget.NewLabel(""), // Top spacer
@@ -102,6 +136,8 @@ Good luck, warrior! ⚔️`
 		widget.NewLabel(""), // Spacer
 		widget.NewLabel(""), // Spacer
 		container.NewCenter(menuButtons),
+		widget.NewLabel(""), // Spacer
+		shortcutHints,       // Add shortcut hints at bottom
 	)
 
 	// === GAME SCREEN (game logic) ===
@@ -346,6 +382,9 @@ Good luck, warrior! ⚔️`
 
 	// Update Start New Game button with proper reset logic
 	startButton.OnTapped = func() {
+		// Play shuffle sound for new game!
+		PlayShuffleSound()
+
 		// Hide old game container
 		gameContainer.Hide()
 
@@ -359,12 +398,29 @@ Good luck, warrior! ⚔️`
 		showGameScreen()
 	}
 
-	// Fullscreen toggle
+	// Desktop shortcuts using proper Fyne shortcut API
+	ctrlQShortcut := &desktop.CustomShortcut{
+		KeyName:  fyne.KeyQ,
+		Modifier: fyne.KeyModifierControl,
+	}
+	myWindow.Canvas().AddShortcut(ctrlQShortcut, func(fyne.Shortcut) {
+		myApp.Quit()
+	})
+
+	// F11 keyboard shortcut for fullscreen
 	isFull := false
 	myWindow.Canvas().SetOnTypedKey(func(ev *fyne.KeyEvent) {
 		if ev.Name == fyne.KeyF11 {
 			isFull = !isFull
 			myWindow.SetFullScreen(isFull)
+			// Update button text to stay in sync
+			if isFull {
+				fullscreenButton.SetText("🪟 Windowed Mode")
+				isFullscreen = true
+			} else {
+				fullscreenButton.SetText("🖥️ Fullscreen Mode")
+				isFullscreen = false
+			}
 		}
 	})
 
