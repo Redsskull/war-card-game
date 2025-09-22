@@ -159,21 +159,21 @@ Good luck, warrior! ⚔️`
 		playerCardCount.TextSize = 20
 
 		// Card images
-		playerCardImage := canvas.NewImageFromFile("Cards/card_joker.png")
+		playerCardImage := canvas.NewImageFromResource(resourceCardjokerPng)
 		playerCardImage.SetMinSize(fyne.NewSize(250, 350))
 		playerCardImage.FillMode = canvas.ImageFillContain
 		playerCardImage.Hide()
 
-		cpuCardImage := canvas.NewImageFromFile("Cards/card_joker.png")
+		cpuCardImage := canvas.NewImageFromResource(resourceCardjokerPng)
 		cpuCardImage.SetMinSize(fyne.NewSize(250, 350))
 		cpuCardImage.FillMode = canvas.ImageFillContain
 		cpuCardImage.Hide()
 
-		playerHandImage := canvas.NewImageFromFile("Cards/card_back_suits_blue.png")
+		playerHandImage := canvas.NewImageFromResource(resourceCardbacksuitsbluePng)
 		playerHandImage.SetMinSize(fyne.NewSize(180, 300))
 		playerHandImage.FillMode = canvas.ImageFillContain
 
-		cpuHandImage := canvas.NewImageFromFile("Cards/card_back_suits_dark.png")
+		cpuHandImage := canvas.NewImageFromResource(resourceCardbacksuitsdarkPng)
 		cpuHandImage.SetMinSize(fyne.NewSize(180, 300))
 		cpuHandImage.FillMode = canvas.ImageFillContain
 
@@ -238,13 +238,11 @@ Good luck, warrior! ⚔️`
 				gameAcceptingClicks = false                   // Disable clicks during war
 				ShakeContainer(battleArea, 25*time.Second/10) // Shake animation for war
 				// Show the tied cars that caused the war (2 seconds)
-				playerCardImage.File = warInfo.TiedCard1.GetImageFilename()
+				SetImageFromCard(playerCardImage, warInfo.TiedCard1)
 				playerCardImage.Show()
-				playerCardImage.Refresh()
 
-				cpuCardImage.File = warInfo.TiedCard2.GetImageFilename()
+				SetImageFromCard(cpuCardImage, warInfo.TiedCard2)
 				cpuCardImage.Show()
-				cpuCardImage.Refresh()
 
 				// Show war message with tied card info
 				gameResult.Segments[0].(*widget.TextSegment).Text = fmt.Sprintf("⚔️ WAR! Both played %s! Each player puts down 4 cards! ⚔️",
@@ -256,10 +254,8 @@ Good luck, warrior! ⚔️`
 				time.AfterFunc(5*time.Second, func() {
 					fyne.Do(func() {
 						// Replace tied cards with card backs
-						playerCardImage.File = "Cards/card_back_suits_blue.png"
-						cpuCardImage.File = "Cards/card_back_suits_dark.png"
-						playerCardImage.Refresh()
-						cpuCardImage.Refresh()
+						SetImageFromBundledResource(playerCardImage, "Cards/card_back_suits_blue.png")
+						SetImageFromBundledResource(cpuCardImage, "Cards/card_back_suits_dark.png")
 
 						gameResult.Segments[0].(*widget.TextSegment).Text = "⚔️ WAR IN PROGRESS... ⚔️"
 						gameResult.Refresh()
@@ -268,10 +264,8 @@ Good luck, warrior! ⚔️`
 					// After 3 more seconds, show final winning cards
 					time.AfterFunc(3*time.Second, func() {
 						fyne.Do(func() {
-							playerCardImage.File = playerCard.GetImageFilename()
-							cpuCardImage.File = cpuCard.GetImageFilename()
-							playerCardImage.Refresh()
-							cpuCardImage.Refresh()
+							SetImageFromCard(playerCardImage, playerCard)
+							SetImageFromCard(cpuCardImage, cpuCard)
 
 							gameResult.Segments[0].(*widget.TextSegment).Text = breakLongText(result, 60)
 							gameResult.Refresh()
@@ -282,13 +276,11 @@ Good luck, warrior! ⚔️`
 				})
 			} else {
 				// Normal round - no war
-				playerCardImage.File = playerCard.GetImageFilename()
+				SetImageFromCard(playerCardImage, playerCard)
 				playerCardImage.Show()
-				playerCardImage.Refresh()
 
-				cpuCardImage.File = cpuCard.GetImageFilename()
+				SetImageFromCard(cpuCardImage, cpuCard)
 				cpuCardImage.Show()
-				cpuCardImage.Refresh()
 
 				gameResult.Segments[0].(*widget.TextSegment).Text = breakLongText(result, 60)
 				gameResult.Show()

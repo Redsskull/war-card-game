@@ -1,8 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"io"
 	"log"
-	"os"
 	"time"
 
 	"github.com/faiface/beep"
@@ -24,22 +25,22 @@ var gameSound *SoundSystem
 func InitializeSoundSystem() error {
 	gameSound = &SoundSystem{}
 
-	// Load shuffle sound
-	shuffleFile, err := os.Open("sounds/card_shuffle.mp3")
-	if err != nil {
-		log.Printf("Warning: Could not load shuffle sound: %v", err)
-		return err
+	// Load shuffle sound from bundled resource
+	shuffleResource := GetBundledResource("sounds/card_shuffle.mp3")
+	if shuffleResource == nil {
+		log.Printf("Warning: Could not load shuffle sound resource")
+		return nil
 	}
-	defer shuffleFile.Close()
 
-	shuffleStreamer, format, err := mp3.Decode(shuffleFile)
+	shuffleReader := bytes.NewReader(shuffleResource.Content())
+	shuffleStreamer, format, err := mp3.Decode(io.NopCloser(shuffleReader))
 	if err != nil {
 		log.Printf("Warning: Could not decode shuffle sound: %v", err)
 		return err
 	}
 	defer shuffleStreamer.Close()
 
-	// Initialize speaker with the audio format (do this only once!)
+	// Initialize speaker with the audio format
 	err = speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 	if err != nil {
 		log.Printf("Warning: Could not initialize speaker: %v", err)
@@ -50,15 +51,15 @@ func InitializeSoundSystem() error {
 	gameSound.shuffleBuffer = beep.NewBuffer(format)
 	gameSound.shuffleBuffer.Append(shuffleStreamer)
 
-	// Load play card sound
-	playCardFile, err := os.Open("sounds/playcard.mp3")
-	if err != nil {
-		log.Printf("Warning: Could not load play card sound: %v", err)
-		return err
+	// Load play card sound from bundled resource
+	playCardResource := GetBundledResource("sounds/playcard.mp3")
+	if playCardResource == nil {
+		log.Printf("Warning: Could not load play card sound resource")
+		return nil
 	}
-	defer playCardFile.Close()
 
-	playCardStreamer, cardFormat, err := mp3.Decode(playCardFile)
+	playCardReader := bytes.NewReader(playCardResource.Content())
+	playCardStreamer, cardFormat, err := mp3.Decode(io.NopCloser(playCardReader))
 	if err != nil {
 		log.Printf("Warning: Could not decode play card sound: %v", err)
 		return err
@@ -87,7 +88,7 @@ func PlayShuffleSound() {
 		return // Silently ignore if sound system not initialized
 	}
 
-	// Create a new streamer from the buffer (so we can play multiple times)
+	// Create a new streamer from the buffer
 	shuffleStreamer := gameSound.shuffleBuffer.Streamer(0, gameSound.shuffleBuffer.Len())
 	speaker.Play(shuffleStreamer)
 }
