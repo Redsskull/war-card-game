@@ -12,11 +12,13 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/driver/desktop"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
 func main() {
 	myApp := app.New()
+	myApp.Settings().SetTheme(theme.DarkTheme())
 	myWindow := myApp.NewWindow("War Card Game")
 	myWindow.Resize(fyne.NewSize(1920, 1080))
 
@@ -51,7 +53,7 @@ func main() {
 	})
 	startButton.Resize(fyne.NewSize(300, 60))
 
-	// Fullscreen toggle button - easy and user-friendly!
+	// Fullscreen toggle button
 	isFullscreen := false
 	var fullscreenButton *widget.Button
 	fullscreenButton = widget.NewButton("🖥️ Fullscreen Mode", func() {

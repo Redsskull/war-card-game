@@ -9,3 +9,12 @@ war-card-game
 # OS files
 .DS_Store
 Thumbs.db
+
+# Distribution files
+dist/
+fyne-cross/
+war-card-game-*
+*.dmg
+*.zip
+*.tar.gz
+
