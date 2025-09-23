@@ -5,7 +5,7 @@ A modern implementation of the classic War card game built with Go and Fyne, fea
 ## 📸 Screenshots
 
 ![Game Opening Screen](images/opening.png)
-*Main menu with dark theme and professional gaming aesthetic*
+*Main menu with dark theme*
 
 ![How to Play Dialog](images/how%20to%20play.png)
 *Complete game rules with card hierarchy explanation*
@@ -133,7 +133,7 @@ This approach significantly accelerated my learning and made collaboration (even
 
 The game uses a clean separation of concerns:
 - **`main.go`**: UI and game flow orchestration
-- **`game.go`**: Core game logic and state management  
+- **`game.go`**: Core game logic and state management
 - **`card.go`**, **`deck.go`**, **`player.go`**: Game entity models
 - **`sound.go`**: Audio system with embedded MP3 handling
 - **`effects.go`**: Visual effects and animations
@@ -179,7 +179,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 Whether you're here to play or learn from the code, I hope you enjoy this labor of love. It represents countless hours of learning, debugging, and the satisfaction of building something complete from scratch.
 
-*"I learned every day after bashing my head against the wall"* - and that's exactly how real programming skills are built! 
+*"I learned every day after bashing my head against the wall"* - and that's exactly how real programming skills are built!
 
 ---
 
