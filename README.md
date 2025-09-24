@@ -2,11 +2,17 @@
 
 A modern implementation of the classic War card game built with Go and Fyne, featuring a complete GUI, sound effects, and cross-platform distribution.
 
+## 🎬 CS50x Final Project Video
+
+[![War Card Game - CS50x Final Project](https://img.youtube.com/vi/U8c8GuNDFkY/maxresdefault.jpg)](https://youtu.be/U8c8GuNDFkY)
+
+*Click to watch my CS50x final project presentation - see the game in action and learn about the development journey!*
+
 ## 📸 Screenshots
 
 ![Game Opening Screen](images/opening.png)
-*Main menu with dark theme*
-
+*Main menu with dark theme* and professional gaming aesthetic*
+*
 ![How to Play Dialog](images/how%20to%20play.png)
 *Complete game rules with card hierarchy explanation*
 
